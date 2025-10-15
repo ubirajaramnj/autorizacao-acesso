@@ -1,12 +1,48 @@
-# docker-compose.yml
 version: '3.8'
+
+# Variáveis de ambiente padrão
+x-environment: &default-environment
+  REACT_APP_PORT: 3000
+  PORT: 3000
+  REACT_APP_API_URL: http://localhost:3001
+  NODE_ENV: development
+
 services:
+  # Aplicação React
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "3050:3050"
+      - "${APP_PORT:-3050}:${REACT_APP_PORT:-3050}"
     environment:
-      - NODE_ENV=development
+      <<: *default-environment
+      REACT_APP_PORT: ${REACT_APP_PORT:-3050}
+      PORT: ${REACT_APP_PORT:-3050}
     volumes:
       - .:/app
       - /app/node_modules
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3050"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Futuro serviço de API
+  # api:
+  #   build: ./api
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     - NODE_ENV=development
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  node_modules:
