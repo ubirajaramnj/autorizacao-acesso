@@ -1,7 +1,7 @@
 // src/App.js
 import React from 'react';
-import CadastroForm from './components/CadastroForm';
-import './styles/App.css';
+import CadastroForm from '../CadastroForm/CadastroForm';
+import './App.css';
 
 function App() {
   return (

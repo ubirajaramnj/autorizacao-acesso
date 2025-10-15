@@ -1,7 +1,7 @@
-// src/components/QRCodeDisplay.js
 import React from 'react';
 import QRCode from 'qrcode.react';
-import { applyDocumentMask, removeMask, detectDocumentType } from '../utils/masks';
+import { applyDocumentMask, removeMask, detectDocumentType } from '../../utils/masks';
+import './QRCodeDisplay.css';
 
 const QRCodeDisplay = ({ data, onClose }) => {
   if (!data) return null;

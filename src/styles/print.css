@@ -1,0 +1,131 @@
+/* Estilos específicos para impressão do comprovante */
+@media print {
+  /* Esconde tudo exceto o comprovante */
+  body * {
+    visibility: hidden;
+  }
+  
+  .comprovante-impressao,
+  .comprovante-impressao * {
+    visibility: visible;
+  }
+  
+  .comprovante-impressao {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+    padding: 20px;
+    box-shadow: none;
+  }
+  
+  /* Esconde elementos não necessários na impressão */
+  .qr-code-overlay,
+  .qr-code-modal,
+  .close-btn,
+  .qr-code-actions {
+    display: none !important;
+  }
+  
+  /* Estilos específicos do comprovante */
+  .comprovante-header {
+    text-align: center;
+    border-bottom: 2px solid var(--dark-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .comprovante-logo {
+    max-height: 60px;
+    width: auto;
+    margin-bottom: 10px;
+  }
+  
+  .comprovante-header h1 {
+    color: var(--dark-color);
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .comprovante-content {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+  }
+  
+  .comprovante-info {
+    flex: 2;
+  }
+  
+  .comprovante-qrcode {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .comprovante-info h2 {
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
+  
+  .comprovante-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .comprovante-table td {
+    padding: 8px 5px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+  }
+  
+  .comprovante-table td:first-child {
+    width: 140px;
+    font-weight: bold;
+    color: var(--text-color);
+  }
+  
+  .qrcode-print {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    display: inline-block;
+  }
+  
+  .comprovante-instruction {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  
+  .comprovante-footer {
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+    font-size: 0.8rem;
+    color: var(--text-color);
+  }
+  
+  .comprovante-footer ul {
+    margin: 5px 0;
+    padding-left: 20px;
+  }
+  
+  .comprovante-footer li {
+    margin-bottom: 3px;
+  }
+}
+
+/* Responsividade do comprovante na impressão */
+@media print and (max-width: 768px) {
+  .comprovante-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .comprovante-info,
+  .comprovante-qrcode {
+    flex: none;
+  }
+}

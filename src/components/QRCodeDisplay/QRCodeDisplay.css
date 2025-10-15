@@ -1,0 +1,189 @@
+/* Overlay do modal */
+.qr-code-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-lg);
+}
+
+/* Modal principal */
+.qr-code-modal {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Header do modal */
+.qr-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: var(--spacing-md);
+}
+
+.qr-code-header h2 {
+  color: var(--success-color);
+  margin: 0;
+  flex: 1;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: var(--danger-color);
+}
+
+/* Conteúdo do modal */
+.qr-code-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* Informações do cadastro */
+.qr-code-info {
+  background: var(--light-color);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-color);
+}
+
+.qr-code-info h3 {
+  color: var(--dark-color);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.2rem;
+}
+
+.qr-code-info p {
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-color);
+}
+
+/* Container do QR Code */
+.qr-code-container {
+  text-align: center;
+  padding: var(--spacing-lg);
+  border: 2px dashed var(--primary-color);
+  border-radius: var(--border-radius);
+  background: var(--light-color);
+}
+
+.qr-code-container h3 {
+  color: var(--dark-color);
+  margin-bottom: var(--spacing-md);
+}
+
+.qr-code-wrapper {
+  display: inline-block;
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+}
+
+.qr-code-instruction {
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: var(--spacing-sm);
+}
+
+/* Ações do modal */
+.qr-code-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  justify-content: center;
+}
+
+.print-btn, .close-modal-btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.print-btn {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.print-btn:hover {
+  background-color: var(--success-hover);
+}
+
+.close-modal-btn {
+  background-color: var(--text-muted);
+  color: white;
+}
+
+.close-modal-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Estilos para o comprovante de impressão */
+.comprovante-impressao {
+  display: none;
+}
+
+/* Responsividade do modal */
+@media (max-width: 768px) {
+  .qr-code-modal {
+    padding: var(--spacing-lg);
+  }
+  
+  .qr-code-content {
+    gap: var(--spacing-lg);
+  }
+  
+  .qr-code-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .qr-code-overlay {
+    padding: var(--spacing-md);
+  }
+  
+  .qr-code-modal {
+    padding: var(--spacing-md);
+  }
+  
+  .qr-code-info {
+    padding: var(--spacing-md);
+  }
+  
+  .qr-code-container {
+    padding: var(--spacing-md);
+  }
+}

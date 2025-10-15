@@ -1,15 +1,15 @@
-// src/components/CadastroForm.js
 import React, { useState } from 'react';
 import InputMask from 'react-input-mask';
-import { cadastrarVisitante } from '../services/api';
+import { cadastrarVisitante } from '../../services/api';
 import { 
   maskTelefone, 
   maskCNPJ, 
   applyDocumentMask, 
   removeMask,
   detectDocumentType 
-} from '../utils/masks';
-import QRCodeDisplay from './QRCodeDisplay';
+} from '../../utils/masks';
+import QRCodeDisplay from '../QRCodeDisplay/QRCodeDisplay';
+import './CadastroForm.css';
 
 const CadastroForm = () => {
   const [formData, setFormData] = useState({
