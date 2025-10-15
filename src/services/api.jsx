@@ -6,13 +6,13 @@ const simulateApiCall = (data, success = true, delay = 1000) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (success) {
-        // Adicionar ID e timestamp
         const record = {
           id: Date.now(),
           ...data,
           createdAt: new Date().toISOString()
         };
         database.push(record);
+        console.log('Dados cadastrados:', record);
         resolve({ data: record, status: 201 });
       } else {
         reject({ error: 'Erro na API', status: 500 });

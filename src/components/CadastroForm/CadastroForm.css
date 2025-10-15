@@ -145,3 +145,10 @@ input.error {
     font-size: 16px;
   }
 }
+
+.field-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+}

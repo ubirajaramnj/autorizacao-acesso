@@ -1,12 +1,13 @@
+// src/components/CadastroForm/CadastroForm.js
 import React, { useState } from 'react';
 import InputMask from 'react-input-mask';
 import { cadastrarVisitante } from '../../services/api';
 import { 
   maskTelefone, 
   maskCNPJ, 
-  applyDocumentMask, 
-  removeMask,
-  detectDocumentType 
+  maskCPF,
+  maskRG,
+  removeMask
 } from '../../utils/masks';
 import QRCodeDisplay from '../QRCodeDisplay/QRCodeDisplay';
 import './CadastroForm.css';
@@ -17,7 +18,8 @@ const CadastroForm = () => {
     nome: '',
     email: '',
     telefone: '',
-    documento: '',
+    cpf: '',
+    rg: '',
     empresa: '',
     cnpj: '',
     periodo: 'unico',
@@ -40,8 +42,10 @@ const CadastroForm = () => {
       formattedValue = maskTelefone(value);
     } else if (name === 'cnpj') {
       formattedValue = maskCNPJ(value);
-    } else if (name === 'documento') {
-      formattedValue = applyDocumentMask(value);
+    } else if (name === 'cpf') {
+      formattedValue = maskCPF(value);
+    } else if (name === 'rg') {
+      formattedValue = maskRG(value); // Usa a nova máscara flexível
     }
     
     setFormData(prev => ({
@@ -64,9 +68,8 @@ const CadastroForm = () => {
     // Validações básicas
     if (!formData.nome.trim()) newErrors.nome = 'Nome é obrigatório';
     
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    // Email é opcional, mas se preenchido deve ser válido
+    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
     
@@ -77,16 +80,22 @@ const CadastroForm = () => {
       newErrors.telefone = 'Telefone inválido';
     }
     
-    const cleanDocumento = removeMask(formData.documento);
-    if (!cleanDocumento) {
-      newErrors.documento = 'Documento é obrigatório';
-    } else {
-      const documentType = detectDocumentType(formData.documento);
-      if (documentType === 'CPF' && cleanDocumento.length !== 11) {
-        newErrors.documento = 'CPF deve ter 11 dígitos';
-      } else if (documentType === 'RG' && cleanDocumento.length < 5) {
-        newErrors.documento = 'RG deve ter pelo menos 5 dígitos';
-      }
+    // Validações de CPF (obrigatório)
+    const cleanCPF = removeMask(formData.cpf);
+    if (!cleanCPF) {
+      newErrors.cpf = 'CPF é obrigatório';
+    } else if (cleanCPF.length !== 11) {
+      newErrors.cpf = 'CPF deve ter 11 dígitos';
+    }
+    
+    // Validações de RG (obrigatório)
+    const cleanRG = removeMask(formData.rg);
+    if (!cleanRG) {
+      newErrors.rg = 'RG é obrigatório';
+    } else if (cleanRG.length < 9) {
+      newErrors.rg = 'RG deve ter pelo menos 9 dígitos';
+    } else if (cleanRG.length > 10) {
+      newErrors.rg = 'RG deve ter no máximo 10 dígitos';
     }
 
     // Validações específicas para prestador de serviço
@@ -144,10 +153,13 @@ const CadastroForm = () => {
       const dadosEnvio = {
         ...formData,
         telefone: removeMask(formData.telefone),
-        documento: removeMask(formData.documento),
+        cpf: removeMask(formData.cpf),
+        rg: removeMask(formData.rg),
         cnpj: removeMask(formData.cnpj),
         // Para período único, usar a mesma data para início e fim
-        dataFim: formData.periodo === 'unico' ? formData.dataInicio : formData.dataFim
+        dataFim: formData.periodo === 'unico' ? formData.dataInicio : formData.dataFim,
+        // Combinar CPF e RG em um campo documento para compatibilidade
+        documento: `${removeMask(formData.cpf)}/${removeMask(formData.rg)}`
       };
 
       const response = await cadastrarVisitante(dadosEnvio);
@@ -155,13 +167,14 @@ const CadastroForm = () => {
       setQrCodeData(response.data);
       setMessage('Cadastro realizado com sucesso!');
       
-      // Limpar formulário após sucesso (mas manter o QR Code aberto)
+      // Limpar formulário após sucesso
       setFormData({
         tipo: 'visitante',
         nome: '',
         email: '',
         telefone: '',
-        documento: '',
+        cpf: '',
+        rg: '',
         empresa: '',
         cnpj: '',
         periodo: 'unico',
@@ -227,7 +240,7 @@ const CadastroForm = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">Email *</label>
+          <label htmlFor="email">Email (Opcional)</label>
           <input
             type="email"
             id="email"
@@ -261,19 +274,44 @@ const CadastroForm = () => {
           {errors.telefone && <span className="error-message">{errors.telefone}</span>}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="documento">CPF ou RG *</label>
-          <input
-            type="text"
-            id="documento"
-            name="documento"
-            value={formData.documento}
-            onChange={handleChange}
-            className={errors.documento ? 'error' : ''}
-            placeholder="000.000.000-00 ou 00.000.000-0"
-            maxLength={18}
-          />
-          {errors.documento && <span className="error-message">{errors.documento}</span>}
+        {/* Documentos - CPF e RG */}
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="cpf">CPF *</label>
+            <InputMask
+              mask="999.999.999-99"
+              value={formData.cpf}
+              onChange={handleChange}
+            >
+              {(inputProps) => (
+                <input
+                  {...inputProps}
+                  type="text"
+                  id="cpf"
+                  name="cpf"
+                  className={errors.cpf ? 'error' : ''}
+                  placeholder="000.000.000-00"
+                />
+              )}
+            </InputMask>
+            {errors.cpf && <span className="error-message">{errors.cpf}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="rg">RG *</label>
+            <input
+              type="text"
+              id="rg"
+              name="rg"
+              value={formData.rg}
+              onChange={handleChange}
+              className={errors.rg ? 'error' : ''}
+              placeholder="000.000.000-0"
+              maxLength={13} // Permite até 000.000.000-0 (13 caracteres)
+            />
+            {errors.rg && <span className="error-message">{errors.rg}</span>}
+            <small className="field-hint">Formato: 000.000.000-0 (9 até 10 dígitos)</small>
+          </div>
         </div>
 
         {/* Campos específicos para Prestador */}
