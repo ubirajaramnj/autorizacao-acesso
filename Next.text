@@ -1,0 +1,11 @@
+Quando quiser evoluir o sistema, podemos implementar:
+
+📊 Listagem de Cadastros - Ver todos os visitantes/prestadores cadastrados
+
+🔍 Busca e Filtros - Encontrar cadastros por nome, data, etc.
+
+📱 App Portaria - Sistema para validar os QR Codes
+
+📧 Notificações - Alertas por email/whatsapp
+
+📈 Relatórios - Estatísticas de acesso

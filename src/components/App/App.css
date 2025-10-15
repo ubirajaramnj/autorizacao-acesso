@@ -60,7 +60,7 @@
 }
 
 .logo {
-  max-height: 80px;
+  max-height: 200px;
   width: auto;
   max-width: 200px;
   object-fit: contain;
@@ -69,14 +69,14 @@
 /* Responsividade */
 @media (max-width: 768px) {
   .logo {
-    max-height: 60px;
+    max-height: 150px;
     max-width: 150px;
   }
 }
 
 @media (max-width: 480px) {
   .logo {
-    max-height: 50px;
-    max-width: 120px;
+    max-height: 150px;
+    max-width: 150px;
   }
 }

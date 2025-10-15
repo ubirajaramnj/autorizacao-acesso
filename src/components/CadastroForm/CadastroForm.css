@@ -152,3 +152,44 @@ input.error {
   margin-top: 4px;
   display: block;
 }
+
+/* Previne zoom automático no iOS Safari */
+@media screen and (max-width: 768px) {
+  input[type="tel"],
+  input[type="text"] {
+    font-size: 16px; /* Previne zoom no iOS */
+  }
+  
+  /* Melhora a aparência dos inputs no mobile */
+  input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0; /* Remove bordas arredondadas no iOS */
+  }
+}
+
+/* Estilo específico para campos numéricos */
+.input-numeric {
+  font-family: 'Courier New', monospace; /* Fonte monoespaçada para números */
+  letter-spacing: 0.5px; /* Melhor legibilidade */
+}
+
+/* Placeholders mais visíveis */
+input::placeholder {
+  color: #999;
+  opacity: 1; /* Firefox */
+}
+
+input::-webkit-input-placeholder {
+  color: #999;
+}
+
+input::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+input:-ms-input-placeholder {
+  color: #999;
+}

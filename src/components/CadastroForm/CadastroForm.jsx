@@ -277,7 +277,7 @@ const CadastroForm = () => {
         {/* Documentos - CPF e RG */}
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="cpf">CPF *</label>
+            <label htmlFor="cpf">CPF * Atualizado</label>
             <InputMask
               mask="999.999.999-99"
               value={formData.cpf}
@@ -286,7 +286,9 @@ const CadastroForm = () => {
               {(inputProps) => (
                 <input
                   {...inputProps}
-                  type="text"
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   id="cpf"
                   name="cpf"
                   className={errors.cpf ? 'error' : ''}
@@ -300,7 +302,9 @@ const CadastroForm = () => {
           <div className="form-group">
             <label htmlFor="rg">RG *</label>
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
               id="rg"
               name="rg"
               value={formData.rg}
@@ -341,7 +345,9 @@ const CadastroForm = () => {
                 {(inputProps) => (
                   <input
                     {...inputProps}
-                    type="text"
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     id="cnpj"
                     name="cnpj"
                     className={errors.cnpj ? 'error' : ''}
