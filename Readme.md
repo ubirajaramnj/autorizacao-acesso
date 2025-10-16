@@ -141,6 +141,7 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
   - CPF: `000.000.000-00`
   - CNPJ: `00.000.000/0000-00`
   - RG: `000.000.000-0` (9-10 dígitos)
+- URL: https://cadastro-visitantes.konsilo.online/?nome=Bira&telefone=11999999999&codigoDaUnidade=R01-QDJ-26
 
 ### 📱 Otimização Mobile Avançada
 - **Teclado Numérico**: Para CPF, RG e CNPJ

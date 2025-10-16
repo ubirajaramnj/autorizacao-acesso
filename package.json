@@ -1,6 +1,7 @@
 {
   "name": "form-cadastro",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:3000": "vite --port 3000",

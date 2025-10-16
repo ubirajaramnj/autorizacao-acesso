@@ -247,6 +247,14 @@ const CadastroForm = () => {
 
       const response = await cadastrarVisitante(dadosCompletos);
       
+      // ✅ ALTERAÇÃO CRÍTICA AQUI:
+      // Em vez de passar todos os dados para o QR Code, passamos apenas o link da API
+      const qrCodePayload = {
+        apiLink: response.data.apiLink, // Apenas o link da API
+        id: response.data.id, // ID para referência
+        tipo: 'autorizacao_link' // Tipo para identificar que é um link
+      };
+      
       setQrCodeData(response.data);
       setMessage('Cadastro realizado com sucesso!');
       setShowConfirmacao(false);

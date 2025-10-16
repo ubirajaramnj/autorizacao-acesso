@@ -22,22 +22,28 @@ const QRCodeDisplay = ({ data, onClose }) => {
   // No QRCodeDisplay.js - substitua a parte do QR Code:
 
   // Gerar dados COMPLETOS para o QR Code
-  const qrData = JSON.stringify({
-    id: data.id,
-    nome: data.nome,
-    tipo: data.tipo,
-    cpf: data.cpf,                    // ✅ ADD
-    rg: data.rg,                      // ✅ ADD
-    email: data.email || '',          // ✅ ADD
-    telefone: data.telefone,          // ✅ ADD
-    empresa: data.empresa || '',      // ✅ ADD
-    cnpj: data.cnpj || '',            // ✅ ADD
-    periodo: data.periodo,            // ✅ ADD
-    dataInicio: data.dataInicio,
-    dataFim: data.dataFim,
-    autorizacao: data.autorizacao,    // ✅ ADD - ESSENCIAL!
-    timestamp: data.createdAt
-  });
+  // ✅ NOVA LÓGICA: Usar apenas o link da API ou ID
+  const getQRCodeContent = () => {
+    // Se tiver apiLink (novo formato), usa apenas o link
+    if (data.apiLink) {
+      return data.apiLink;
+    }
+    // Se for o formato antigo com ID, cria o link
+    if (data.id) {
+      return `https://minha.api/autorizacoes/${data.id}`;
+    }
+    // Fallback: mantém o formato antigo por segurança
+    return JSON.stringify({
+      id: data.id,
+      nome: data.nome,
+      tipo: data.tipo,
+      periodo: data.periodo,
+      dataInicio: data.dataInicio,
+      dataFim: data.dataFim
+    });
+  };
+
+  const qrData = getQRCodeContent();
 
   console.log('QR Code gerado:', qrData); // Para debug
 
@@ -75,6 +81,16 @@ const QRCodeDisplay = ({ data, onClose }) => {
             }</p>
             {data.empresa && <p><strong>Empresa:</strong> {data.empresa}</p>}
             {data.cnpj && <p><strong>CNPJ:</strong> {data.cnpj}</p>}
+
+            {/* ✅ ADICIONE ESTAS LINHAS: */}
+            {(data.apiLink || data.id) && (
+              <div className="api-link-info">
+                <p><strong>ID da Autorização:</strong> {data.id}</p>
+                {data.apiLink && (
+                  <p><strong>Link da API:</strong> <code>{data.apiLink}</code></p>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="qr-code-container">
@@ -88,8 +104,12 @@ const QRCodeDisplay = ({ data, onClose }) => {
               />
             </div>
             <p className="qr-code-instruction">
-              Apresente este QR Code na portaria para validação do acesso
+              {data.apiLink || data.id 
+                ? "Apresente este QR Code na portaria - O sistema consultará os dados via API"
+                : "Apresente este QR Code na portaria para validação do acesso"
+              }
             </p>
+
           </div>
         </div>
         

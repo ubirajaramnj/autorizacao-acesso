@@ -13,5 +13,14 @@ export default defineConfig(({ mode }) => {
       allowedHosts: ['.konsilo.online']
     },
     // Remove completamente a opção define
+    // Configuração para garantir compatibilidade
+    esbuild: {
+      target: 'es2020'
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'es2020'
+      }
+    }
   }
 })
