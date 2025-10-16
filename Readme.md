@@ -38,7 +38,7 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **react-input-mask** ^2.0.4 - Máscaras para campos de entrada
 
 ### Desenvolvimento
-- **react-scripts** 5.0.1 - Ferramentas de build e desenvolvimento
+- **Vite** ^4.4.0 - Build tool ultrarrápido
 - **Docker** - Containerização da aplicação
 - **Docker Compose** - Orquestração de containers
 
@@ -46,21 +46,16 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 
 ```
 form-cadastro/
-├── public/
-│   ├── index.html
-│   ├── manifest.json
-│   ├── robots.txt
-│   └── LogoSolar.jpg (logo da empresa)
 ├── src/
 │   ├── components/
 │   │   ├── App/
-│   │   │   ├── App.js
+│   │   │   ├── App.jsx
 │   │   │   └── App.css
 │   │   ├── CadastroForm/
-│   │   │   ├── CadastroForm.js
+│   │   │   ├── CadastroForm.jsx
 │   │   │   └── CadastroForm.css
 │   │   ├── QRCodeDisplay/
-│   │   │   ├── QRCodeDisplay.js
+│   │   │   ├── QRCodeDisplay.jsx
 │   │   │   └── QRCodeDisplay.css
 │   │   └── InputNumero/ (componentes customizados)
 │   ├── services/
@@ -71,11 +66,13 @@ form-cadastro/
 │   │   ├── globals.css
 │   │   ├── responsive.css
 │   │   └── print.css
-│   ├── App.js (componente raiz)
-│   └── index.js (ponto de entrada)
+│   ├── App.jsx (componente raiz)
+│   └── main.jsx (ponto de entrada)
+├── public/ (arquivos estáticos)
 ├── scripts/ (scripts de desenvolvimento)
 ├── Dockerfile
 ├── docker-compose.yml
+├── vite.config.js (configuração do Vite)
 ├── .env (configurações de ambiente)
 └── README.md
 ```
@@ -97,7 +94,7 @@ cd form-cadastro
 npm install
 
 # Execute em modo desenvolvimento
-npm start
+npm run dev
 ```
 
 A aplicação estará disponível em: `http://localhost:3000`
@@ -112,7 +109,7 @@ docker-compose up --build
 docker-compose up -d
 
 # Com porta customizada
-REACT_APP_PORT=4000 APP_PORT=4000 docker-compose up --build
+VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 ```
 
 ## 🎮 Como Usar
@@ -168,31 +165,32 @@ REACT_APP_PORT=4000 APP_PORT=4000 docker-compose up --build
 ### Scripts Disponíveis
 
 ```bash
-# Desenvolvimento
-npm start          # Servidor de desenvolvimento (porta 3000)
-npm run start:port # Porta customizada: REACT_APP_PORT=4000 npm run start:port
-npm test           # Executa testes
-npm run build      # Build para produção
-npm run eject      # Ejetar configurações (irreversível)
+# Desenvolvimento com Vite
+npm run dev           # Servidor de desenvolvimento (porta 3000)
+npm run dev:3000      # Porta 3000
+npm run dev:4000      # Porta 4000
+npm run dev:5000      # Porta 5000
 
-# Desenvolvimento com portas específicas
-npm run dev        # Porta 3000
-npm run dev:4000   # Porta 4000
-npm run dev:5000   # Porta 5000
+# Build e produção
+npm run build         # Build para produção
+npm run preview       # Preview do build de produção
+
+# Compatibilidade
+npm start            # Alias para npm run dev
+npm run start:port   # Porta customizada: VITE_PORT=4000 npm run start:port
 ```
 
 ### Variáveis de Ambiente
 
 ```env
-# Porta da aplicação React
-REACT_APP_PORT=3000
-PORT=3000
+# Porta da aplicação Vite
+VITE_PORT=3000
 
 # API URL (para futuras integrações)
-REACT_APP_API_URL=http://localhost:3001
+VITE_APP_API_URL=http://localhost:3001
 
 # Variáveis para Docker
-DOCKER_APP_PORT=3000
+APP_PORT=3000
 ```
 
 ### Configuração de Portas Flexíveis
@@ -201,13 +199,13 @@ O sistema suporta execução em qualquer porta:
 
 ```bash
 # Desenvolvimento local
-REACT_APP_PORT=4000 npm run start:port
+VITE_PORT=4000 npm run dev
 
 # Docker com porta customizada
-REACT_APP_PORT=4000 APP_PORT=4000 docker-compose up --build
+VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 
 # Usando arquivo .env
-cp .env.docker .env
+cp .env.example .env
 # Edite as portas no .env e execute:
 docker-compose --env-file .env up --build
 ```
@@ -235,7 +233,6 @@ npm install
 **Problemas de cache no mobile:**
 - O sistema inclui meta tags anti-cache
 - Força reload em navegação por cache
-- Service Worker para controle granular
 
 **Problemas com Docker:**
 ```bash
@@ -246,21 +243,21 @@ docker-compose up --build
 
 ## 📦 Build para Produção
 
-### Com npm
+### Com Vite
 ```bash
 npm run build
 ```
 
 ### Com Docker
 ```bash
-docker-compose -f docker-compose.prod.yml up --build
+docker-compose up --build
 ```
 
 ## 🚀 Deploy
 
 ### Opção 1: Servidor Web Estático
 - Execute `npm run build`
-- Sirva a pasta `build/` com seu servidor web
+- Sirva a pasta `dist/` com seu servidor web
 
 ### Opção 2: Container Docker
 - Build da imagem Docker
@@ -304,7 +301,30 @@ O sistema é totalmente responsivo e foi otimizado para:
 - QR Code incluído
 - Informações completas
 
+## ⚡ Migração para Vite - Benefícios
+
+### 🚀 Performance Melhorada
+- **Inicialização ultrarrápida** do servidor de desenvolvimento
+- **HMR (Hot Module Replacement)** instantâneo
+- **Build otimizado** para produção com Rollup
+
+### 🔧 Configuração Simplificada
+- **Configuração zero** para a maioria dos projetos
+- **Plugin system** extensível
+- **Variáveis de ambiente** prefixadas com `VITE_`
+
+### 📦 Desenvolvimento Moderno
+- **Suporte nativo** para ES modules
+- **TypeScript** integrado
+- **CSS** e **assets** otimizados
+
 ## 🔄 Melhorias Recentes
+
+### 🎯 Versão 2.0.0 - Migração para Vite
+- ✅ **Migração de react-scripts para Vite** - Performance drasticamente melhorada
+- ✅ **Builds mais rápidos** - Desenvolvimento e produção
+- ✅ **HMR instantâneo** - Atualizações em tempo real sem refresh
+- ✅ **Configuração simplificada** - Vite config mais enxuto
 
 ### 🎯 Versão 1.1.0 - Otimização Mobile
 - ✅ Teclado numérico para CPF, RG e CNPJ
@@ -353,4 +373,4 @@ Para dúvidas ou problemas:
 
 **Desenvolvido com ❤️ para simplificar o cadastro e controle de acesso em condomínios e empresas.**
 
-**🎉 Sistema 100% funcional e otimizado para mobile!**
+**🎉 Sistema 100% funcional e otimizado para mobile com performance Vite!**

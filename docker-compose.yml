@@ -1,34 +1,35 @@
 version: '3.8'
 
-# Variáveis de ambiente padrão
+# Variáveis de ambiente padrão - ATUALIZADAS para Vite
 x-environment: &default-environment
-  REACT_APP_PORT: 3000
-  PORT: 3000
-  REACT_APP_API_URL: http://localhost:3001
+  VITE_PORT: 3000
+  VITE_APP_API_URL: http://localhost:3001
   NODE_ENV: development
 
 services:
-  # Aplicação React
+  # Aplicação React com Vite
   app:
     build: 
       context: .
       dockerfile: Dockerfile
     ports:
-      - "${APP_PORT:-3050}:${REACT_APP_PORT:-3050}"
+      - "${APP_PORT:-3050}:${VITE_PORT:-3050}"
     environment:
       <<: *default-environment
-      REACT_APP_PORT: ${REACT_APP_PORT:-3050}
-      PORT: ${REACT_APP_PORT:-3050}
+      VITE_PORT: ${VITE_PORT:-3050}
+      PORT: ${VITE_PORT:-3050}
     volumes:
       - .:/app
       - /app/node_modules
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3050"]
+      # Healthcheck atualizado para Vite
+      test: ["CMD", "curl", "-f", "http://localhost:${VITE_PORT:-3050}"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 10s
 
   # Futuro serviço de API
   # api:

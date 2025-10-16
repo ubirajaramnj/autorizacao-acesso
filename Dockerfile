@@ -9,7 +9,7 @@ RUN wget -O /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vish
 
 # Copia os arquivos de dependências primeiro
 COPY package.json package-lock.json ./
-RUN npm install --force
+RUN npm install
 
 # Copia o restante dos arquivos
 COPY . .
@@ -20,9 +20,9 @@ RUN mkdir -p scripts
 # Expõe a porta (será sobrescrita pelo docker-compose se necessário)
 EXPOSE 3000
 
-# Health check
+# Health check atualizado para Vite
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# Usa o script customizado ou o padrão
-CMD ["npm", "run", "start:port"]
+# Comando atualizado para Vite
+CMD ["npm", "run", "dev"]
