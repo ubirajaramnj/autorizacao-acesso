@@ -9,7 +9,7 @@ RUN wget -O /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vish
 
 # Copia os arquivos de dependências primeiro
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --force
 
 # Copia o restante dos arquivos
 COPY . .
