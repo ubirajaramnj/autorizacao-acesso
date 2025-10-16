@@ -1,0 +1,185 @@
+.confirmacao-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.confirmacao-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.confirmacao-header {
+  text-align: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.confirmacao-header h2 {
+  color: #333;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.confirmacao-content {
+  margin-bottom: 25px;
+}
+
+.autorizacao-texto {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+  margin-bottom: 20px;
+}
+
+.autorizacao-texto p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.detalhes-adicionais h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.detalhes-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.detalhe-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.detalhe-item strong {
+  color: #555;
+}
+
+.detalhe-item span {
+  color: #333;
+  text-align: right;
+}
+
+.confirmacao-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-confirmar, .btn-cancelar {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 180px;
+}
+
+.btn-confirmar {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-confirmar:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.btn-cancelar {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .confirmacao-modal {
+    padding: 20px;
+  }
+  
+  .confirmacao-actions {
+    flex-direction: column;
+  }
+  
+  .btn-confirmar, .btn-cancelar {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .detalhe-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .detalhe-item span {
+    text-align: left;
+  }
+}
+
+.autorizador-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.autorizador-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+}
+
+.autorizador-info p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.confirmacao-subtitle {
+  color: #666;
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.confirmacao-footer {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.confirmacao-footer p {
+  margin: 0;
+  color: #666;
+  font-size: 0.8rem;
+}

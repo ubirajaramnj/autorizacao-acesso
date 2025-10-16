@@ -1,5 +1,5 @@
 // src/components/CadastroForm/CadastroForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InputMask from 'react-input-mask';
 import { cadastrarVisitante } from '../../services/api';
 import { 
@@ -10,9 +10,16 @@ import {
   removeMask
 } from '../../utils/masks';
 import QRCodeDisplay from '../QRCodeDisplay/QRCodeDisplay';
+import ConfirmacaoAutorizacao from '../ConfirmacaoAutorizacao/ConfirmacaoAutorizacao';
 import './CadastroForm.css';
 
 const CadastroForm = () => {
+  const [dadosAutorizador, setDadosAutorizador] = useState({
+    nome: '',
+    telefone: '',
+    codigoDaUnidade: ''
+  });
+
   const [formData, setFormData] = useState({
     tipo: 'visitante',
     nome: '',
@@ -31,6 +38,57 @@ const CadastroForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [qrCodeData, setQrCodeData] = useState(null);
+
+  const [showConfirmacao, setShowConfirmacao] = useState(false);
+  const [dadosConfirmacao, setDadosConfirmacao] = useState(null);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const nome = urlParams.get('nome');
+    const telefone = urlParams.get('telefone');
+    const codigoDaUnidade = urlParams.get('codigoDaUnidade');
+
+    if (nome && telefone && codigoDaUnidade) {
+
+      const telefoneFormatado = formatarTelefoneAutorizador(telefone);
+
+      setDadosAutorizador({
+        nome: decodeURIComponent(nome),
+        telefone: telefoneFormatado,
+        codigoDaUnidade: decodeURIComponent(codigoDaUnidade)
+      });
+    }
+  }, []);
+
+   const coletarInformacoesDispositivo = () => {
+    return {
+      dataHora: new Date().toISOString(),
+      dispositivo: navigator.userAgent,
+      navegador: navigator.userAgent,
+      linguagem: navigator.language,
+      plataforma: navigator.platform,
+      // IP seria coletado via backend na implementação real
+      ip: 'A ser coletado pelo backend'
+    };
+  };
+
+  // Função para formatar telefone do autorizador
+  const formatarTelefoneAutorizador = (telefone) => {
+    if (!telefone) return '';
+    
+    // Remove tudo que não é dígito
+    const numeros = telefone.replace(/\D/g, '');
+    
+    // Aplica a máscara baseada no tamanho
+    if (numeros.length === 10) {
+      return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    } else if (numeros.length === 11) {
+      return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else {
+      // Se não tiver o formato esperado, retorna o original
+      return telefone;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -146,26 +204,52 @@ const CadastroForm = () => {
       return;
     }
 
+    // Verifica se temos dados do autorizador
+    if (!dadosAutorizador.nome || !dadosAutorizador.telefone || !dadosAutorizador.codigoDaUnidade) {
+      setMessage('Erro: Dados do autorizador não encontrados. Acesse via link correto.');
+      return;
+    }
+
+    // Prepara dados para confirmação
+    const dadosParaConfirmacao = {
+      dadosAutorizacao: {
+        ...dadosAutorizador,
+        ...coletarInformacoesDispositivo()
+      },
+      dadosVisitante: {
+        ...formData,
+        dataFim: formData.periodo === 'unico' ? formData.dataInicio : formData.dataFim
+      }
+    };
+
+    setDadosConfirmacao(dadosParaConfirmacao);
+    setShowConfirmacao(true);
+  };
+
+  const handleConfirmarAutorizacao = async () => {
     setIsSubmitting(true);
 
     try {
-      // Preparar dados para envio (remover máscaras)
-      const dadosEnvio = {
-        ...formData,
-        telefone: removeMask(formData.telefone),
-        cpf: removeMask(formData.cpf),
-        rg: removeMask(formData.rg),
-        cnpj: removeMask(formData.cnpj),
-        // Para período único, usar a mesma data para início e fim
-        dataFim: formData.periodo === 'unico' ? formData.dataInicio : formData.dataFim,
-        // Combinar CPF e RG em um campo documento para compatibilidade
-        documento: `${removeMask(formData.cpf)}/${removeMask(formData.rg)}`
+      // Preparar dados completos para envio
+      const dadosCompletos = {
+        ...dadosConfirmacao.dadosVisitante,
+        autorizacao: {
+          ...dadosConfirmacao.dadosAutorizacao,
+          dataHoraAutorizacao: new Date().toISOString()
+        },
+        // Incluir informações do dispositivo
+        informacoesDispositivo: coletarInformacoesDispositivo(),
+        telefone: removeMask(dadosConfirmacao.dadosVisitante.telefone),
+        cpf: removeMask(dadosConfirmacao.dadosVisitante.cpf),
+        rg: removeMask(dadosConfirmacao.dadosVisitante.rg),
+        cnpj: removeMask(dadosConfirmacao.dadosVisitante.cnpj)
       };
 
-      const response = await cadastrarVisitante(dadosEnvio);
+      const response = await cadastrarVisitante(dadosCompletos);
       
       setQrCodeData(response.data);
       setMessage('Cadastro realizado com sucesso!');
+      setShowConfirmacao(false);
       
       // Limpar formulário após sucesso
       setFormData({
@@ -187,7 +271,13 @@ const CadastroForm = () => {
       console.error('Erro no cadastro:', error);
     } finally {
       setIsSubmitting(false);
+      setShowConfirmacao(false);
     }
+  };
+
+  const handleCancelarAutorizacao = () => {
+    setShowConfirmacao(false);
+    setDadosConfirmacao(null);
   };
 
   const closeQRCode = () => {
@@ -196,6 +286,13 @@ const CadastroForm = () => {
 
   return (
     <div className="cadastro-form">
+      {dadosAutorizador.nome && (
+        <div className="autorizador-info">
+          <h3>Autorização de: {dadosAutorizador.nome}</h3>
+          <p>Unidade: {dadosAutorizador.codigoDaUnidade} | Tel: {dadosAutorizador.telefone}</p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         {/* Tipo de Cadastro */}
         <div className="form-group">
@@ -351,7 +448,6 @@ const CadastroForm = () => {
                     {...inputProps}
                     type="tel"
                     inputMode="numeric"
-                    pattern="[0-9]*"
                     id="cnpj"
                     name="cnpj"
                     className={errors.cnpj ? 'error' : ''}
@@ -442,6 +538,15 @@ const CadastroForm = () => {
           {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
         </button>
       </form>
+
+      {showConfirmacao && (
+        <ConfirmacaoAutorizacao
+          dadosAutorizacao={dadosConfirmacao.dadosAutorizacao}
+          dadosVisitante={dadosConfirmacao.dadosVisitante}
+          onConfirmar={handleConfirmarAutorizacao}
+          onCancelar={handleCancelarAutorizacao}
+        />
+      )}
 
       {/* Modal do QR Code */}
       {qrCodeData && (

@@ -1,18 +1,19 @@
-// src/services/api.js
-// Mock da API - Simula chamadas HTTP
 let database = [];
 
 const simulateApiCall = (data, success = true, delay = 1000) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (success) {
+        // Adicionar ID, timestamp e informações completas
         const record = {
           id: Date.now(),
           ...data,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          status: 'autorizado'
         };
         database.push(record);
-        console.log('Dados cadastrados:', record);
+        console.log('📝 Dados cadastrados com autorização:', record);
+        console.log('💾 Database atual:', database);
         resolve({ data: record, status: 201 });
       } else {
         reject({ error: 'Erro na API', status: 500 });
@@ -24,8 +25,6 @@ const simulateApiCall = (data, success = true, delay = 1000) => {
 export const cadastrarVisitante = async (data) => {
   try {
     const response = await simulateApiCall(data);
-    console.log('Dados cadastrados:', response.data);
-    console.log('Database atual:', database);
     return response;
   } catch (error) {
     throw error;
