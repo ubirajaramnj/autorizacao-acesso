@@ -4,6 +4,8 @@
 
 Sistema web desenvolvido em React para cadastro de visitantes e prestadores de serviço em condomínios ou empresas. O sistema gera um QR Code para validação na portaria e oferece um comprovante de impressão profissional.
 
+**✨ Destaque:** Sistema totalmente otimizado para dispositivos móveis com experiência de usuário excepcional.
+
 ## 🚀 Funcionalidades
 
 ### ✨ Principais Características
@@ -11,9 +13,10 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Períodos Flexíveis**: Dia único ou intervalo de datas
 - **Validação por QR Code**: Geração automática de QR Code para portaria
 - **Comprovante de Impressão**: Layout otimizado para impressão
-- **Design Responsivo**: Funciona em desktop, tablet e mobile
+- **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
 - **Máscaras Inteligentes**: CPF, CNPJ, telefone e RG formatados automaticamente
+- **Otimização Mobile**: Teclado numérico, áreas de toque ampliadas, UX refinada
 
 ### 🎯 Fluxo do Sistema
 1. **Cadastro**: Preenchimento do formulário com dados pessoais
@@ -50,19 +53,30 @@ form-cadastro/
 │   └── LogoSolar.jpg (logo da empresa)
 ├── src/
 │   ├── components/
-│   │   ├── CadastroForm.js (formulário principal)
-│   │   └── QRCodeDisplay.js (modal do QR Code)
+│   │   ├── App/
+│   │   │   ├── App.js
+│   │   │   └── App.css
+│   │   ├── CadastroForm/
+│   │   │   ├── CadastroForm.js
+│   │   │   └── CadastroForm.css
+│   │   ├── QRCodeDisplay/
+│   │   │   ├── QRCodeDisplay.js
+│   │   │   └── QRCodeDisplay.css
+│   │   └── InputNumero/ (componentes customizados)
 │   ├── services/
 │   │   └── api.js (mock da API)
 │   ├── utils/
 │   │   └── masks.js (utilitários de máscaras)
 │   ├── styles/
-│   │   └── App.css (estilos principais)
+│   │   ├── globals.css
+│   │   ├── responsive.css
+│   │   └── print.css
 │   ├── App.js (componente raiz)
 │   └── index.js (ponto de entrada)
+├── scripts/ (scripts de desenvolvimento)
 ├── Dockerfile
 ├── docker-compose.yml
-├── package.json
+├── .env (configurações de ambiente)
 └── README.md
 ```
 
@@ -96,13 +110,16 @@ docker-compose up --build
 
 # Execução em background
 docker-compose up -d
+
+# Com porta customizada
+REACT_APP_PORT=4000 APP_PORT=4000 docker-compose up --build
 ```
 
 ## 🎮 Como Usar
 
 ### 1. Cadastro de Visitante
 - Selecione "Visitante"
-- Preencha dados pessoais (nome, email, telefone, CPF/RG)
+- Preencha dados pessoais (nome, email opcional, telefone, CPF, RG)
 - Escolha data única ou período
 - Clique em "Cadastrar"
 
@@ -126,7 +143,15 @@ docker-compose up -d
   - Telefone: `(11) 99999-9999`
   - CPF: `000.000.000-00`
   - CNPJ: `00.000.000/0000-00`
-  - RG: `00.000.000-0`
+  - RG: `000.000.000-0` (9-10 dígitos)
+
+### 📱 Otimização Mobile Avançada
+- **Teclado Numérico**: Para CPF, RG e CNPJ
+- **Áreas de Toque Ampliadas**: Botões e inputs fáceis de tocar
+- **Radio Buttons Customizados**: Visíveis e intuitivos em todos os dispositivos
+- **Campos de Data Otimizados**: Ícone claro e área de toque ampliada
+- **Prevenção de Cache**: Meta tags e estratégias anti-cache
+- **Font Size 16px**: Previne zoom automático no iOS
 
 ### Sistema de Períodos
 - **Dia Único**: Uma data específica
@@ -144,33 +169,54 @@ docker-compose up -d
 
 ```bash
 # Desenvolvimento
-npm start          # Servidor de desenvolvimento
+npm start          # Servidor de desenvolvimento (porta 3000)
+npm run start:port # Porta customizada: REACT_APP_PORT=4000 npm run start:port
 npm test           # Executa testes
 npm run build      # Build para produção
 npm run eject      # Ejetar configurações (irreversível)
+
+# Desenvolvimento com portas específicas
+npm run dev        # Porta 3000
+npm run dev:4000   # Porta 4000
+npm run dev:5000   # Porta 5000
 ```
 
 ### Variáveis de Ambiente
-O projeto utiliza `process.env.PUBLIC_URL` para recursos estáticos.
 
-### Estrutura de Componentes
+```env
+# Porta da aplicação React
+REACT_APP_PORT=3000
+PORT=3000
 
-#### CadastroForm.js
-- Gerencia o estado do formulário
-- Aplica validações
-- Controla máscaras e formatações
-- Comunica com a API
+# API URL (para futuras integrações)
+REACT_APP_API_URL=http://localhost:3001
 
-#### QRCodeDisplay.js
-- Exibe modal com resumo
-- Gera QR Code
-- Controla impressão do comprovante
+# Variáveis para Docker
+DOCKER_APP_PORT=3000
+```
+
+### Configuração de Portas Flexíveis
+
+O sistema suporta execução em qualquer porta:
+
+```bash
+# Desenvolvimento local
+REACT_APP_PORT=4000 npm run start:port
+
+# Docker com porta customizada
+REACT_APP_PORT=4000 APP_PORT=4000 docker-compose up --build
+
+# Usando arquivo .env
+cp .env.docker .env
+# Edite as portas no .env e execute:
+docker-compose --env-file .env up --build
+```
 
 ## 🐛 Solução de Problemas
 
 ### Erros Comuns
 
-**Porta 3000 ocupada:**
+**Porta ocupada:**
 ```bash
 # Linux/Mac
 sudo lsof -t -i tcp:3000 | xargs kill -9
@@ -185,6 +231,11 @@ taskkill /PID <PID> /F
 rm -rf node_modules package-lock.json
 npm install
 ```
+
+**Problemas de cache no mobile:**
+- O sistema inclui meta tags anti-cache
+- Força reload em navegação por cache
+- Service Worker para controle granular
 
 **Problemas com Docker:**
 ```bash
@@ -225,25 +276,59 @@ docker-compose -f docker-compose.prod.yml up --build
 - Prevenção de datas retroativas
 - Sanitização de entradas
 - Validação de períodos lógicos
+- Campos obrigatórios: Nome, Telefone, CPF, RG
 
 ## 📱 Responsividade
 
-O sistema é totalmente responsivo e foi testado em:
-- ✅ Desktop (1920x1080+)
-- ✅ Tablet (768x1024)
-- ✅ Mobile (375x667)
-- ✅ Impressão (layout otimizado)
+O sistema é totalmente responsivo e foi otimizado para:
 
-## 🔄 Próximas Melhorias
+### ✅ Desktop (1920x1080+)
+- Layout tradicional com formulário centralizado
+- Campos lado a lado quando apropriado
 
-- [ ] Integração com API real
-- [ ] Sistema de autenticação
-- [ ] Listagem de cadastros
-- [ ] Relatórios e estatísticas
-- [ ] Notificações por email
-- [ ] Validação de CPF/CNPJ real
-- [ ] Backup automático de dados
-- [ ] Múltiplos idiomas
+### ✅ Tablet (768x1024)
+- Layout adaptativo
+- Radio buttons em coluna
+- Áreas de toque adequadas
+
+### ✅ Mobile (375x667)
+- **Teclado numérico** para campos de documento
+- **Áreas de toque ampliadas** (min-height: 44px)
+- **Radio buttons customizados** visíveis e claros
+- **Campos de data** com ícone e placeholder intuitivos
+- **Prevenção de zoom** automático no iOS
+- **Otimização de performance** para conexões móveis
+
+### ✅ Impressão (layout otimizado)
+- Comprovante profissional
+- QR Code incluído
+- Informações completas
+
+## 🔄 Melhorias Recentes
+
+### 🎯 Versão 1.1.0 - Otimização Mobile
+- ✅ Teclado numérico para CPF, RG e CNPJ
+- ✅ Radio buttons visíveis em todos os dispositivos
+- ✅ Campos de data com UX melhorada
+- ✅ Prevenção de cache em mobile
+- ✅ Áreas de toque ampliadas
+- ✅ Validações compatíveis com máscaras
+
+### 🎯 Versão 1.0.0 - Funcionalidades Base
+- ✅ Cadastro de visitantes e prestadores
+- ✅ Geração de QR Code
+- ✅ Comprovante de impressão
+- ✅ Validações de formulário
+- ✅ Máscaras automáticas
+
+## 👥 Próximas Melhorias
+
+- [ ] **Listagem de Cadastros** - Visualizar todos os registros
+- [ ] **Sistema de Validação** - Página para portaria validar QR Codes
+- [ ] **Dashboard Administrativo** - Estatísticas e relatórios
+- [ ] **API Real** - Substituir mock por backend
+- [ ] **Notificações** - Alertas por email/whatsapp
+- [ ] **Upload de Documentos** - Anexar imagens/documentos
 
 ## 👥 Contribuição
 
@@ -267,3 +352,5 @@ Para dúvidas ou problemas:
 ---
 
 **Desenvolvido com ❤️ para simplificar o cadastro e controle de acesso em condomínios e empresas.**
+
+**🎉 Sistema 100% funcional e otimizado para mobile!**

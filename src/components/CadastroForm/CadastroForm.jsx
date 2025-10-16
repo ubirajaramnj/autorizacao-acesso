@@ -282,13 +282,17 @@ const CadastroForm = () => {
               mask="999.999.999-99"
               value={formData.cpf}
               onChange={handleChange}
+              onBeforeMask={(value) => {
+                // Permite que a máscara funcione mesmo com inputMode numeric
+                return value.replace(/\D/g, '');
+              }}
             >
               {(inputProps) => (
                 <input
                   {...inputProps}
                   type="tel"
                   inputMode="numeric"
-                  pattern="[0-9]*"
+                  //pattern="[0-9]*"
                   id="cpf"
                   name="cpf"
                   className={errors.cpf ? 'error' : ''}
@@ -304,7 +308,7 @@ const CadastroForm = () => {
             <input
               type="tel"
               inputMode="numeric"
-              pattern="[0-9]*"
+              //pattern="[0-9]*"
               id="rg"
               name="rg"
               value={formData.rg}

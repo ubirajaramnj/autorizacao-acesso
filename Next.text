@@ -9,3 +9,33 @@ Quando quiser evoluir o sistema, podemos implementar:
 📧 Notificações - Alertas por email/whatsapp
 
 📈 Relatórios - Estatísticas de acesso
+
+Quando quiser evoluir o sistema, podemos implementar:
+
+1. Listagem de Cadastros
+Visualizar todos os registros
+
+Buscar e filtrar
+
+Ordenar por data/nome
+
+2. Sistema de Validação
+Página para portaria validar QR Codes
+
+Histórico de acessos
+
+Status em tempo real
+
+3. Dashboard Admin
+Estatísticas de uso
+
+Relatórios
+
+Gestão de usuários
+
+4. Funcionalidades Avançadas
+Upload de documentos
+
+Notificações por email
+
+API real com banco de dados
