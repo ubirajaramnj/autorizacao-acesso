@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import CadastroForm from '../CadastroForm/CadastroForm';
+import PortariaPage from '../../pages/PortariaPage';
 // import ValidacaoPortaria from '../../components/ValidacaoPortaria/ValidacaoPortaria';
 import './App.css';
 import '../../styles/globals.css';
@@ -23,7 +24,8 @@ function App() {
           <h1>Sistema de Cadastro</h1>
           <Routes>
             <Route path="/" element={<CadastroForm />} />
-            {/* <Route path="/portaria" element={<ValidacaoPortaria />} /> */}
+            {/* 🆕 NOVA ROTA da portaria */}
+            <Route path="/portaria" element={<PortariaPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
