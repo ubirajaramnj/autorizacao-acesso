@@ -16,11 +16,11 @@ const PortariaLeitorQR = () => {
 
   const qrReaderRef = useRef(null);
 
-  const extractIdFromLink = (link) => {
-    // Extrai ID de links como: https://minha.api/autorizacoes/123456
-    const match = link.match(/\/(\d+)$/);
-    return match ? match[1] : link; // Se não for link, assume que já é o ID
-  };
+    const extractIdFromLink = (link) => {
+        // ✅ CORREÇÃO: Regex para capturar UUIDs (letras, números e hífens)
+        const match = link.match(/\/([a-fA-F0-9-]+)$/);
+        return match ? match[1] : link; // Se não for link, assume que já é o ID
+    };
 
   const buscarDadosAutorizacao = async (id) => {
     setLoading(true);
@@ -29,12 +29,19 @@ const PortariaLeitorQR = () => {
     setEntradaRegistrada(false);
 
     try {
-      const cleanId = extractIdFromLink(id);
-      const response = await buscarAutorizacao(cleanId);
+        const qrCodeRawValue = id[0].rawValue;
+
+        console.log('Id lido do QR:', qrCodeRawValue);
+        const cleanId = extractIdFromLink(qrCodeRawValue);
+      console.log('Id tratado:', cleanId);
+      const response = await buscarAutorizacaoPorId(cleanId);
+      
+      console.log('Response do Bd:', response);
       
       setAutorizacao(response.data);
       setSuccess('Autorização encontrada! Verifique os dados abaixo.');
     } catch (err) {
+      console.error('Erro ao recuperar autorização:', err);
       setError('Autorização não encontrada ou inválida');
       setAutorizacao(null);
     } finally {
@@ -45,6 +52,7 @@ const PortariaLeitorQR = () => {
   const handleScan = useCallback((result) => {
     if (result && !loading && !autorizacao) {
       setScanning(false);
+      console.error('QR lido:', result);
       buscarDadosAutorizacao(result);
     }
   }, [loading, autorizacao]);
