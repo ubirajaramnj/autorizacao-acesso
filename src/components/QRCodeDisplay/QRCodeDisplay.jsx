@@ -19,16 +19,27 @@ const QRCodeDisplay = ({ data, onClose }) => {
     return applyDocumentMask(document);
   };
 
-  // Gerar dados para o QR Code
+  // No QRCodeDisplay.js - substitua a parte do QR Code:
+
+  // Gerar dados COMPLETOS para o QR Code
   const qrData = JSON.stringify({
     id: data.id,
     nome: data.nome,
     tipo: data.tipo,
-    documento: data.documento,
+    cpf: data.cpf,                    // ✅ ADD
+    rg: data.rg,                      // ✅ ADD
+    email: data.email || '',          // ✅ ADD
+    telefone: data.telefone,          // ✅ ADD
+    empresa: data.empresa || '',      // ✅ ADD
+    cnpj: data.cnpj || '',            // ✅ ADD
+    periodo: data.periodo,            // ✅ ADD
     dataInicio: data.dataInicio,
     dataFim: data.dataFim,
+    autorizacao: data.autorizacao,    // ✅ ADD - ESSENCIAL!
     timestamp: data.createdAt
   });
+
+  console.log('QR Code gerado:', qrData); // Para debug
 
   // Função para imprimir apenas o comprovante
   const handlePrint = () => {

@@ -18,14 +18,43 @@ const ValidacaoPortaria = () => {
   const handleScan = useCallback((result) => {
     if (result) {
       try {
+        console.log('QR Code raw:', result); // Debug
+        
         const dados = JSON.parse(result);
-        console.log('QR Code lido:', dados);
-        setQrData(dados);
+        console.log('QR Code parsed:', dados); // Debug
+        
+        // 🔧 VALIDAÇÃO ROBUSTA dos dados
+        if (!dados || typeof dados !== 'object') {
+          throw new Error('QR Code inválido: dados não encontrados');
+        }
+        
+        // 🔧 VERIFICAÇÃO DOS CAMPOS OBRIGATÓRIOS
+        if (!dados.nome) {
+          throw new Error('QR Code inválido: campo "nome" não encontrado');
+        }
+        
+        // 🔧 GARANTIR que campos essenciais existam
+        const dadosCompletos = {
+          ...dados,
+          cpf: dados.cpf || 'Não informado',
+          rg: dados.rg || 'Não informado',
+          telefone: dados.telefone || 'Não informado',
+          periodo: dados.periodo || 'unico',
+          dataInicio: dados.dataInicio || new Date().toISOString(),
+          autorizacao: dados.autorizacao || {
+            nome: 'Não informado',
+            codigoDaUnidade: 'Não informado',
+            dataHoraAutorizacao: new Date().toISOString()
+          }
+        };
+        
+        setQrData(dadosCompletos);
         setEtapa('validacao');
         setErrorCamera(null);
+        
       } catch (error) {
-        console.error('QR Code inválido:', error);
-        setErrorCamera('QR Code inválido. Tente novamente.');
+        console.error('Erro ao processar QR Code:', error);
+        setErrorCamera(`QR Code inválido: ${error.message}`);
       }
     }
   }, []);
@@ -222,33 +251,43 @@ const ValidacaoPortaria = () => {
         <div className="detalhes-validacao">
           <div className="dados-visitante">
             <h2>Dados do Visitante</h2>
-            <div className="info-grid">
-              <div className="info-item">
-                <strong>Nome:</strong>
-                <span>{qrData.nome}</span>
+              <div className="info-grid">
+                <div className="info-item">
+                  <strong>Nome:</strong>
+                  <span>{qrData.nome || 'Não informado'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>Tipo:</strong>
+                  <span>{qrData.tipo === 'visitante' ? 'Visitante' : 'Prestador'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>CPF:</strong>
+                  <span>{qrData.cpf || 'Não informado'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>RG:</strong>
+                  <span>{qrData.rg || 'Não informado'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>Telefone:</strong>
+                  <span>{qrData.telefone || 'Não informado'}</span>
+                </div>
+                <div className="info-item">
+                  <strong>Período:</strong>
+                  <span>
+                    {qrData.periodo === 'unico' 
+                      ? `Dia único: ${new Date(qrData.dataInicio).toLocaleDateString('pt-BR')}`
+                      : `De ${new Date(qrData.dataInicio).toLocaleDateString('pt-BR')} até ${new Date(qrData.dataFim).toLocaleDateString('pt-BR')}`
+                    }
+                  </span>
+                </div>
+                {qrData.empresa && (
+                  <div className="info-item">
+                    <strong>Empresa:</strong>
+                    <span>{qrData.empresa}</span>
+                  </div>
+                )}
               </div>
-              <div className="info-item">
-                <strong>Tipo:</strong>
-                <span>{qrData.tipo === 'visitante' ? 'Visitante' : 'Prestador'}</span>
-              </div>
-              <div className="info-item">
-                <strong>CPF:</strong>
-                <span>{qrData.cpf}</span>
-              </div>
-              <div className="info-item">
-                <strong>RG:</strong>
-                <span>{qrData.rg}</span>
-              </div>
-              <div className="info-item">
-                <strong>Período:</strong>
-                <span>
-                  {qrData.periodo === 'unico' 
-                    ? `Dia único: ${new Date(qrData.dataInicio).toLocaleDateString('pt-BR')}`
-                    : `De ${new Date(qrData.dataInicio).toLocaleDateString('pt-BR')} até ${new Date(qrData.dataFim).toLocaleDateString('pt-BR')}`
-                  }
-                </span>
-              </div>
-            </div>
           </div>
 
           <div className="dados-autorizacao">
@@ -256,15 +295,20 @@ const ValidacaoPortaria = () => {
             <div className="info-grid">
               <div className="info-item">
                 <strong>Autorizado por:</strong>
-                <span>{qrData.autorizacao.nome}</span>
+                <span>{qrData.autorizacao?.nome || 'Não informado'}</span>
               </div>
               <div className="info-item">
                 <strong>Unidade:</strong>
-                <span>{qrData.autorizacao.codigoDaUnidade}</span>
+                <span>{qrData.autorizacao?.codigoDaUnidade || 'Não informado'}</span>
               </div>
               <div className="info-item">
                 <strong>Data/Hora Autorização:</strong>
-                <span>{new Date(qrData.autorizacao.dataHoraAutorizacao).toLocaleString('pt-BR')}</span>
+                <span>
+                  {qrData.autorizacao?.dataHoraAutorizacao 
+                    ? new Date(qrData.autorizacao.dataHoraAutorizacao).toLocaleString('pt-BR')
+                    : 'Não informado'
+                  }
+                </span>
               </div>
             </div>
           </div>
