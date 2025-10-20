@@ -1,7 +1,8 @@
 // src/components/PortariaLeitorQR/PortariaLeitorQR.jsx
 import React, { useState, useRef, useCallback } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { buscarAutorizacaoPorId, registrarEntrada, uploadDocumento } from '../../services/api';
+import { buscarAutorizacaoPorId, registrarEntrada, uploadDocumento } from '../../services/mockApi';
+import { autorizacoesApi } from '../../services/autorizacoesApi';
 import DocumentUpload from '../DocumentUpload/DocumentUpload';
 import './PortariaLeitorQR.css';
 
@@ -34,7 +35,7 @@ const PortariaLeitorQR = () => {
         console.log('Id lido do QR:', qrCodeRawValue);
         const cleanId = extractIdFromLink(qrCodeRawValue);
       console.log('Id tratado:', cleanId);
-      const response = await buscarAutorizacaoPorId(cleanId);
+      const response = await autorizacoesApi.buscarAutorizacaoPorId(cleanId);
       
       console.log('Response do Bd:', response);
       
@@ -79,7 +80,7 @@ const PortariaLeitorQR = () => {
         portariaResponsavel: 'Funcionário Portaria' // Em produção, pegar do login
       };
 
-      await registrarEntrada(dadosEntrada);
+      await autorizacoesApi.registrarEntrada(dadosEntrada);
       setEntradaRegistrada(true);
       setSuccess('✅ Entrada registrada com sucesso!');
     } catch (err) {

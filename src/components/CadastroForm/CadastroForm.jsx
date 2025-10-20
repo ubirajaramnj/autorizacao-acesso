@@ -1,7 +1,7 @@
 // src/components/CadastroForm/CadastroForm.js
 import React, { useState, useEffect } from 'react';
 import InputMask from 'react-input-mask';
-import { cadastrarVisitante } from '../../services/api';
+import { autorizacoesApi } from '../../services/autorizacoesApi';
 import { 
   maskTelefone, 
   maskCNPJ, 
@@ -245,7 +245,7 @@ const CadastroForm = () => {
         cnpj: removeMask(dadosConfirmacao.dadosVisitante.cnpj)
       };
 
-      const response = await cadastrarVisitante(dadosCompletos);
+      const response = await autorizacoesApi.criarAutorizacao(dadosCompletos);
       
       // ✅ ALTERAÇÃO CRÍTICA AQUI:
       // Em vez de passar todos os dados para o QR Code, passamos apenas o link da API
