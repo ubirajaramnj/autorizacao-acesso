@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 // Configuração base da API
-const API_BASE_URL = 'https://condominio-api-itac.konsilo.online/api';
+//const API_BASE_URL = 'https://condominio-api-itac.konsilo.online/api';
+const API_BASE_URL = 'https://localhost:8091/api';
 const API_TIMEOUT = 10000; // 10 segundos
 
 // Instância do axios com configurações padrão
@@ -117,6 +118,7 @@ export const autorizacoesApi = {
   // 🎯 ADAPTAÇÃO DOS PAYLOADS
   adaptarPayloadCriacao(dados) {
     return {
+      condominioId: "SOLARITAC",
       // Dados básicos do visitante/prestador
       tipo: dados.tipo, // 'visitante' ou 'prestador'
       nome: dados.nome,
@@ -139,12 +141,15 @@ export const autorizacoesApi = {
         nome: dados.autorizacao?.nome,
         telefone: dados.autorizacao?.telefone,
         unidade: dados.autorizacao?.codigoDaUnidade,
+        dataHora: dados.autorizacao?.dataHoraAutorizacao || new Date().toISOString(),
         dataHoraAutorizacao: dados.autorizacao?.dataHoraAutorizacao || new Date().toISOString()
       },
       
       // Informações do dispositivo (opcional)
       dispositivo: dados.informacoesDispositivo || {
-        userAgent: navigator.userAgent,
+        dataHora: dados.autorizacao?.dataHoraAutorizacao || new Date().toISOString(),
+        dispositivo: navigator.userAgent,
+        navegador: navigator.userAgent,
         linguagem: navigator.language,
         plataforma: navigator.platform
       },

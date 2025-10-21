@@ -1,0 +1,38 @@
+{
+    "id": "8a3f8a17-6205-4dce-8724-542e9746d81c",
+    "condominioId": "SOLARITAC",
+    "tipo": "visitante",
+    "nome": "Ubirajara Mendes Nunes Junior",
+    "email": "ubirajara.mnj@gmail.com",
+    "telefone": "21993901365",
+    "cpf": "06497502769",
+    "rg": "3424332432",
+    "empresa": "",
+    "cnpj": "",
+    "periodo": "unico",
+    "dataInicio": "2025-10-17",
+    "dataFim": "2025-10-17",
+    "veiculo": {
+        "placa": "FCS7E57",
+        "marca": "Jeep",
+        "modelo": "Compass"
+    },
+    "autorizacao": {
+        "nome": "Bira",
+        "telefone": "(11) 99999-9999",
+        "codigoDaUnidade": "R01-QDJ-26",
+        "dataHora": "2025-10-16T21:47:20.136Z",
+        "dataHoraAutorizacao": "2025-10-16T21:47:21.648Z"
+    },
+    "informacoesDispositivo": {
+        "dataHora": "2025-10-16T21:47:21.648Z",
+        "dispositivo": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+        "navegador": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+        "linguagem": "en-US",
+        "plataforma": "Win32",
+        "ip": "A ser coletado pelo backend"
+    },
+    "createdAt": "2025-10-16T21:47:22.659Z",
+    "updatedAt": "2025-10-16T21:47:22.659Z",
+    "status": "autorizado"
+}
