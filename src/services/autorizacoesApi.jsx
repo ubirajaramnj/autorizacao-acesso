@@ -118,7 +118,7 @@ export const autorizacoesApi = {
   adaptarPayloadCriacao(dados) {
     return {
       // Dados básicos do visitante/prestador
-      tipoPessoa: dados.tipo, // 'visitante' ou 'prestador'
+      tipo: dados.tipo, // 'visitante' ou 'prestador'
       nome: dados.nome,
       email: dados.email || null,
       telefone: dados.telefone,
@@ -130,7 +130,7 @@ export const autorizacoesApi = {
       cnpj: dados.cnpj || null,
       
       // Período de autorização
-      tipoPeriodo: dados.periodo, // 'unico' ou 'intervalo'
+      periodo: dados.periodo, // 'unico' ou 'intervalo'
       dataInicio: dados.dataInicio,
       dataFim: dados.periodo === 'unico' ? dados.dataInicio : dados.dataFim,
       
