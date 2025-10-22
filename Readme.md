@@ -4,7 +4,7 @@
 
 Sistema web desenvolvido em React para cadastro de visitantes e prestadores de serviço em condomínios ou empresas. O sistema gera um QR Code para validação na portaria e oferece um comprovante de impressão profissional.
 
-**✨ Destaque:** Sistema totalmente otimizado para dispositivos móveis com experiência de usuário excepcional.
+**✨ Destaque:** Sistema completo com frontend, sistema de portaria e integração com API real.
 
 ## 🚀 Funcionalidades
 
@@ -12,6 +12,8 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Cadastro Duplo**: Suporte para visitantes e prestadores de serviço
 - **Períodos Flexíveis**: Dia único ou intervalo de datas
 - **Validação por QR Code**: Geração automática de QR Code para portaria
+- **Sistema de Portaria**: Leitor QR Code integrado com registro de entrada
+- **Upload de Documentos**: Anexar imagens e PDFs dos visitantes
 - **Comprovante de Impressão**: Layout otimizado para impressão
 - **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
@@ -21,8 +23,10 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 ### 🎯 Fluxo do Sistema
 1. **Cadastro**: Preenchimento do formulário com dados pessoais
 2. **Validação**: Verificação automática dos campos obrigatórios
-3. **QR Code**: Geração do código para validação na portaria
-4. **Comprovante**: Impressão do recibo com todos os dados
+3. **QR Code**: Geração do código com link da API para validação
+4. **Portaria**: Leitura do QR Code e registro de entrada
+5. **Upload**: Captura de documentos na portaria
+6. **Comprovante**: Impressão do recibo com todos os dados
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -36,6 +40,8 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **axios** ^1.4.0 - Cliente HTTP para APIs
 - **qrcode.react** ^3.1.0 - Geração de QR Codes
 - **react-input-mask** ^2.0.4 - Máscaras para campos de entrada
+- **@yudiel/react-qr-scanner** - Leitor de QR Code para portaria
+- **uuid** - Geração de IDs únicos
 
 ### Desenvolvimento
 - **Vite** ^4.4.0 - Build tool ultrarrápido
@@ -57,16 +63,32 @@ form-cadastro/
 │   │   ├── QRCodeDisplay/
 │   │   │   ├── QRCodeDisplay.jsx
 │   │   │   └── QRCodeDisplay.css
-│   │   └── InputNumero/ (componentes customizados)
+│   │   ├── PortariaLeitorQR/
+│   │   │   ├── PortariaLeitorQR.jsx
+│   │   │   └── PortariaLeitorQR.css
+│   │   ├── DocumentUpload/
+│   │   │   ├── DocumentUpload.jsx
+│   │   │   └── DocumentUpload.css
+│   │   ├── ApiStatus/
+│   │   │   ├── ApiStatus.jsx
+│   │   │   └── ApiStatus.css
+│   │   └── Navigation/
+│   │       ├── Navigation.jsx
+│   │       └── Navigation.css
+│   ├── pages/
+│   │   ├── CadastroPage.jsx
+│   │   └── PortariaPage.jsx
 │   ├── services/
-│   │   └── api.js (mock da API)
+│   │   ├── api.js (serviço híbrido mock/real)
+│   │   ├── realApi.js (integração com API real)
+│   │   └── apiService.js (gerenciador de serviços)
 │   ├── utils/
 │   │   └── masks.js (utilitários de máscaras)
 │   ├── styles/
 │   │   ├── globals.css
 │   │   ├── responsive.css
 │   │   └── print.css
-│   ├── App.jsx (componente raiz)
+│   ├── App.jsx (componente raiz com rotas)
 │   └── main.jsx (ponto de entrada)
 ├── public/ (arquivos estáticos)
 ├── scripts/ (scripts de desenvolvimento)
@@ -114,22 +136,54 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 
 ## 🎮 Como Usar
 
-### 1. Cadastro de Visitante
-- Selecione "Visitante"
+### 1. Cadastro de Visitante/Prestador
+- Acesse: `http://localhost:3000/cadastro`
+- Selecione "Visitante" ou "Prestador de Serviço"
 - Preencha dados pessoais (nome, email opcional, telefone, CPF, RG)
+- Para prestadores: adicione empresa e CNPJ
 - Escolha data única ou período
 - Clique em "Cadastrar"
+- **QR Code gerado** com link da API
 
-### 2. Cadastro de Prestador
-- Selecione "Prestador de Serviço"
-- Preencha dados pessoais + empresa (CNPJ opcional)
-- Defina o período de serviço
-- Clique em "Cadastrar"
+### 2. Sistema de Portaria
+- Acesse: `http://localhost:3000/portaria`
+- Clique em "Ler QR Code" ou cole o link manualmente
+- **Sistema busca dados** da API real ou mock
+- Verifique os dados do visitante
+- Faça **upload de documentos** (opcional)
+- Clique em "Registrar Entrada"
 
 ### 3. Validação na Portaria
 - Apresente o QR Code gerado
-- A portaria valida o código
+- A portaria escaneia o código
+- Sistema consulta API em tempo real
 - Acesso liberado conforme período autorizado
+
+## 🔄 Sistema Híbrido de API
+
+### 🎯 Funcionamento Inteligente
+- **Mock Local**: Dados persistem no localStorage para desenvolvimento
+- **API Real**: Integração com backend real em produção
+- **Fallback Automático**: Se API real falhar, usa mock automaticamente
+- **Mesma Interface**: Componentes não precisam de alterações
+
+### 🔧 Configuração de API
+```env
+# Usar API real (true/false)
+VITE_USE_REAL_API=true
+
+# URL da API real
+VITE_API_URL=https://condominio-api-itac.konsilo.online/api
+
+# Porta da aplicação
+VITE_PORT=3000
+```
+
+### 📡 Endpoints da API Real
+- `POST /api/autorizacoes` - Criar autorização
+- `GET /api/autorizacoes/{id}` - Buscar autorização por ID
+- `POST /api/entradas` - Registrar entrada
+- `POST /api/documentos/upload` - Upload de documentos
 
 ## 📊 Funcionalidades Detalhadas
 
@@ -141,7 +195,19 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
   - CPF: `000.000.000-00`
   - CNPJ: `00.000.000/0000-00`
   - RG: `000.000.000-0` (9-10 dígitos)
-- URL: https://cadastro-visitantes.konsilo.online/?nome=Bira&telefone=11999999999&codigoDaUnidade=R01-QDJ-26
+
+### 📱 Sistema de Portaria
+- **Leitor QR Code**: Scanner com câmera traseira
+- **Busca Manual**: Input para colar link ou ID
+- **Upload de Documentos**: Suporte a imagens e PDF (até 5MB)
+- **Registro de Entrada**: Timestamp automático
+- **Interface Otimizada**: Design focado em produtividade
+
+### 🔒 Persistência de Dados
+- **LocalStorage**: Dados persistem entre recarregamentos
+- **UUID**: Identificadores únicos para evitar conflitos
+- **Export/Import**: Backup e restauração de dados
+- **Dados de Teste**: Geração automática para desenvolvimento
 
 ### 📱 Otimização Mobile Avançada
 - **Teclado Numérico**: Para CPF, RG e CNPJ
@@ -150,16 +216,6 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - **Campos de Data Otimizados**: Ícone claro e área de toque ampliada
 - **Prevenção de Cache**: Meta tags e estratégias anti-cache
 - **Font Size 16px**: Previne zoom automático no iOS
-
-### Sistema de Períodos
-- **Dia Único**: Uma data específica
-- **Intervalo**: Data de início e fim
-- **Validações**: Não permite datas retroativas
-
-### QR Code e Comprovante
-- **QR Code Dinâmico**: Contém todos os dados do cadastro
-- **Comprovante Otimizado**: Impressão limpa e profissional
-- **Informações Completas**: Todos os dados relevantes para portaria
 
 ## 🔧 Desenvolvimento
 
@@ -179,24 +235,27 @@ npm run preview       # Preview do build de produção
 # Compatibilidade
 npm start            # Alias para npm run dev
 npm run start:port   # Porta customizada: VITE_PORT=4000 npm run start:port
+
+# Utilitários de desenvolvimento
+npm run test:api     # Testar conexão com API real
 ```
 
 ### Variáveis de Ambiente
 
 ```env
-# Porta da aplicação Vite
+# API Configuration
+VITE_USE_REAL_API=false
+VITE_API_URL=https://condominio-api-itac.konsilo.online/api
+
+# Application
 VITE_PORT=3000
+VITE_APP_NAME="Sistema de Acesso"
 
-# API URL (para futuras integrações)
-VITE_APP_API_URL=http://localhost:3001
-
-# Variáveis para Docker
+# Docker
 APP_PORT=3000
 ```
 
 ### Configuração de Portas Flexíveis
-
-O sistema suporta execução em qualquer porta:
 
 ```bash
 # Desenvolvimento local
@@ -205,10 +264,8 @@ VITE_PORT=4000 npm run dev
 # Docker com porta customizada
 VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 
-# Usando arquivo .env
-cp .env.example .env
-# Edite as portas no .env e execute:
-docker-compose --env-file .env up --build
+# API real em produção
+VITE_USE_REAL_API=true VITE_API_URL=https://sua-api.com/api npm run build
 ```
 
 ## 🐛 Solução de Problemas
@@ -225,15 +282,15 @@ netstat -ano | findstr :3000
 taskkill /PID <PID> /F
 ```
 
-**Dependências corrompidas:**
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
+**Problemas com QR Scanner:**
+- Certifique-se de que o HTTPS está habilitado em produção
+- Verifique as permissões da câmera no navegador
+- Use o modo de busca manual como alternativa
 
-**Problemas de cache no mobile:**
-- O sistema inclui meta tags anti-cache
-- Força reload em navegação por cache
+**API Real Indisponível:**
+- Sistema automaticamente usa mock local
+- Dados são mantidos no localStorage
+- Funcionalidade completa preservada
 
 **Problemas com Docker:**
 ```bash
@@ -246,26 +303,44 @@ docker-compose up --build
 
 ### Com Vite
 ```bash
+# Build para produção
 npm run build
+
+# Preview do build
+npm run preview
 ```
 
 ### Com Docker
 ```bash
+# Build e execução
 docker-compose up --build
+
+# Apenas build
+docker-compose build
 ```
 
 ## 🚀 Deploy
 
 ### Opção 1: Servidor Web Estático
 - Execute `npm run build`
-- Sirva a pasta `dist/` com seu servidor web
+- Sirva a pasta `dist/` com seu servidor web (Nginx, Apache)
 
 ### Opção 2: Container Docker
 - Build da imagem Docker
-- Deploy em qualquer serviço de containers
+- Deploy em qualquer serviço de containers (Kubernetes, ECS)
 
 ### Opção 3: Plataformas Cloud
-- Netlify, Vercel, AWS S3, etc.
+- **Netlify/Vercel**: Deploy automático do build estático
+- **AWS S3 + CloudFront**: Hospedagem estática com CDN
+- **Heroku**: Deploy com container Docker
+
+### Configuração de Produção
+```env
+VITE_USE_REAL_API=true
+VITE_API_URL=https://sua-api-real.com/api
+VITE_PORT=443
+NODE_ENV=production
+```
 
 ## 🔒 Segurança e Validações
 
@@ -275,6 +350,7 @@ docker-compose up --build
 - Sanitização de entradas
 - Validação de períodos lógicos
 - Campos obrigatórios: Nome, Telefone, CPF, RG
+- Upload seguro de documentos com validação de tipo e tamanho
 
 ## 📱 Responsividade
 
@@ -283,43 +359,36 @@ O sistema é totalmente responsivo e foi otimizado para:
 ### ✅ Desktop (1920x1080+)
 - Layout tradicional com formulário centralizado
 - Campos lado a lado quando apropriado
+- Navegação por abas entre cadastro/portaria
 
 ### ✅ Tablet (768x1024)
 - Layout adaptativo
 - Radio buttons em coluna
 - Áreas de toque adequadas
+- Scanner QR em tamanho otimizado
 
 ### ✅ Mobile (375x667)
 - **Teclado numérico** para campos de documento
 - **Áreas de toque ampliadas** (min-height: 44px)
 - **Radio buttons customizados** visíveis e claros
 - **Campos de data** com ícone e placeholder intuitivos
+- **Scanner QR** em tela cheia quando ativado
 - **Prevenção de zoom** automático no iOS
-- **Otimização de performance** para conexões móveis
 
 ### ✅ Impressão (layout otimizado)
 - Comprovante profissional
 - QR Code incluído
 - Informações completas
-
-## ⚡ Migração para Vite - Benefícios
-
-### 🚀 Performance Melhorada
-- **Inicialização ultrarrápida** do servidor de desenvolvimento
-- **HMR (Hot Module Replacement)** instantâneo
-- **Build otimizado** para produção com Rollup
-
-### 🔧 Configuração Simplificada
-- **Configuração zero** para a maioria dos projetos
-- **Plugin system** extensível
-- **Variáveis de ambiente** prefixadas com `VITE_`
-
-### 📦 Desenvolvimento Moderno
-- **Suporte nativo** para ES modules
-- **TypeScript** integrado
-- **CSS** e **assets** otimizados
+- Design limpo e legível
 
 ## 🔄 Melhorias Recentes
+
+### 🎯 Versão 3.0.0 - Sistema Completo
+- ✅ **Sistema de Portaria** - Leitor QR Code integrado
+- ✅ **Upload de Documentos** - Suporte a imagens e PDF
+- ✅ **API Híbrida** - Mock local + API real com fallback
+- ✅ **Persistência de Dados** - LocalStorage com UUID
+- ✅ **Interface Unificada** - Navegação entre cadastro/portaria
 
 ### 🎯 Versão 2.0.0 - Migração para Vite
 - ✅ **Migração de react-scripts para Vite** - Performance drasticamente melhorada
@@ -335,21 +404,38 @@ O sistema é totalmente responsivo e foi otimizado para:
 - ✅ Áreas de toque ampliadas
 - ✅ Validações compatíveis com máscaras
 
-### 🎯 Versão 1.0.0 - Funcionalidades Base
-- ✅ Cadastro de visitantes e prestadores
-- ✅ Geração de QR Code
-- ✅ Comprovante de impressão
-- ✅ Validações de formulário
-- ✅ Máscaras automáticas
-
 ## 👥 Próximas Melhorias
 
-- [ ] **Listagem de Cadastros** - Visualizar todos os registros
-- [ ] **Sistema de Validação** - Página para portaria validar QR Codes
 - [ ] **Dashboard Administrativo** - Estatísticas e relatórios
-- [ ] **API Real** - Substituir mock por backend
-- [ ] **Notificações** - Alertas por email/whatsapp
-- [ ] **Upload de Documentos** - Anexar imagens/documentos
+- [ ] **Notificações em Tempo Real** - WebSocket para atualizações
+- [ ] **Biometria Facial** - Reconhecimento facial na portaria
+- [ ] **Relatórios Avançados** - Analytics e métricas de acesso
+- [ ] **Sistema Multi-Condomínio** - Suporte a múltiplas unidades
+- [ ] **App Mobile** - Versão nativa para iOS e Android
+- [ ] **Integração com Câmeras** - Captura automática na entrada
+
+## 🛠 API e Desenvolvimento
+
+### Para Desenvolvedores
+
+**Estrutura de Serviços:**
+```javascript
+// Uso nos componentes
+import { apiService } from './services/apiService';
+
+// O serviço decide automaticamente entre mock e API real
+const response = await apiService.cadastrarVisitante(dados);
+const autorizacao = await apiService.buscarAutorizacaoPorId(id);
+```
+
+**Extensão da API:**
+```javascript
+// Adicione novos endpoints em realApi.js
+async novoEndpoint(dados) {
+  const response = await apiClient.post('/novo-endpoint', dados);
+  return response.data;
+}
+```
 
 ## 👥 Contribuição
 
@@ -359,6 +445,12 @@ O sistema é totalmente responsivo e foi otimizado para:
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
+### Guidelines de Contribuição
+- Mantenha a compatibilidade com o sistema híbrido de API
+- Adicione testes para novas funcionalidades
+- Documente novas variáveis de ambiente
+- Mantenha a responsividade mobile
+
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
@@ -367,11 +459,14 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 Para dúvidas ou problemas:
 1. Verifique a seção de troubleshooting
-2. Consulte os issues abertos
+2. Consulte os issues abertos no repositório
 3. Crie um novo issue com detalhes do problema
+4. Para suporte técnico: [email/contato]
 
 ---
 
 **Desenvolvido com ❤️ para simplificar o cadastro e controle de acesso em condomínios e empresas.**
 
-**🎉 Sistema 100% funcional e otimizado para mobile com performance Vite!**
+**🎉 Sistema 100% funcional com frontend, portaria e integração API real!**
+
+**🏗️ Arquitetura escalável preparada para produção**
