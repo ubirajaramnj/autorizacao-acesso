@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 // Configuração base da API
-//const API_BASE_URL = 'https://condominio-api-itac.konsilo.online/api';
-const API_BASE_URL = 'https://localhost:8091/api';
+const API_BASE_URL = 'https://condominio-api-dev.konsilo.online/api';
+//const API_BASE_URL = 'http://localhost:8090/api';
 const API_TIMEOUT = 10000; // 10 segundos
 
 // Instância do axios com configurações padrão

@@ -25,12 +25,13 @@ const QRCodeDisplay = ({ data, onClose }) => {
   // ✅ NOVA LÓGICA: Usar apenas o link da API ou ID
   const getQRCodeContent = () => {
     // Se tiver apiLink (novo formato), usa apenas o link
-    if (data.apiLink) {
-      return data.apiLink;
+    if (data.link) {
+      return data.link;
     }
+
     // Se for o formato antigo com ID, cria o link
     if (data.id) {
-      return `https://minha.api/autorizacoes/${data.id}`;
+      return data.link;
     }
     // Fallback: mantém o formato antigo por segurança
     return JSON.stringify({
@@ -72,7 +73,7 @@ const QRCodeDisplay = ({ data, onClose }) => {
           <div className="qr-code-info">
             <h3>Dados do Cadastro:</h3>
             <p><strong>Nome:</strong> {data.nome}</p>
-            <p><strong>Tipo:</strong> {data.tipo === 'visitante' ? 'Visitante' : 'Prestador de Serviço'}</p>
+            <p><strong>Tipo:</strong> {data.tipo === 'Visitante' ? 'Visitante' : 'Prestador de Serviço'}</p>
             <p><strong>CPF:</strong> {formatCPF(data.cpf)}</p>
             <p><strong>RG:</strong> {formatRG(data.rg)}</p>
             <p><strong>Período:</strong> {data.periodo === 'unico' 
@@ -86,9 +87,9 @@ const QRCodeDisplay = ({ data, onClose }) => {
             {(data.apiLink || data.id) && (
               <div className="api-link-info">
                 <p><strong>ID da Autorização:</strong> {data.id}</p>
-                {data.apiLink && (
-                  <p><strong>Link da API:</strong> <code>{data.apiLink}</code></p>
-                )}
+                {/* {data.link && (
+                  <p><strong>Link da API:</strong> <code>{data.link}</code></p>
+                )} */}
               </div>
             )}
           </div>
