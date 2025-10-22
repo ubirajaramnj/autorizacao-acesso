@@ -237,3 +237,94 @@
   max-width: 400px;
   margin: 0 auto;
 }
+
+/* Adicione ao PortariaLeitorQR.css */
+
+.documentos-enviados {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #28a745;
+}
+
+.documentos-enviados h3 {
+  margin: 0 0 15px 0;
+  color: #155724;
+}
+
+.documentos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.documento-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+}
+
+.documento-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.documento-nome {
+  font-weight: bold;
+  color: #333;
+}
+
+.documento-tamanho {
+  font-size: 0.8em;
+  color: #666;
+}
+
+.documento-acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.visualizar-btn {
+  padding: 5px 10px;
+  background: #17a2b8;
+  color: white;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.8em;
+}
+
+.visualizar-btn:hover {
+  background: #138496;
+}
+
+.documentos-count {
+  margin: 10px 0 0 0;
+  font-size: 0.9em;
+  color: #28a745;
+  font-weight: bold;
+}
+
+.entrada-info {
+  margin: 10px 0 0 0;
+  padding: 10px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 5px;
+  color: #856404;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.entrada-btn.disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.entrada-btn:not(.disabled):hover {
+  background: #218838;
+}

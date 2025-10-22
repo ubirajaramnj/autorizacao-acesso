@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './DocumentUpload.css';
 
-const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError }) => {
+const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemoveDocument }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
@@ -25,16 +25,9 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError }) => {
           throw new Error('Arquivo muito grande. Máximo 5MB');
         }
 
-        // Simular upload
-        const formData = new FormData();
-        formData.append('documento', file);
-        formData.append('autorizacaoId', autorizacaoId);
-
-        // Aqui você chamaria a API real
-        // const response = await uploadDocumento(file, autorizacaoId);
-        
+        // 🆕 CORREÇÃO: Criar fileInfo com ID único
         const fileInfo = {
-          id: Date.now(),
+          id: Date.now() + Math.random(), // ID único
           name: file.name,
           type: file.type,
           size: file.size,
@@ -44,6 +37,7 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError }) => {
 
         setUploadedFiles(prev => [...prev, fileInfo]);
         
+        // 🆕 CORREÇÃO: Chamar onUploadSuccess com fileInfo
         if (onUploadSuccess) {
           onUploadSuccess(fileInfo);
         }
@@ -58,8 +52,12 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError }) => {
     }
   };
 
-  const removeFile = (fileId) => {
+   const removeFile = (fileId) => {
     setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
+    // 🆕 CORREÇÃO: Chamar onRemoveDocument se existir
+    if (onRemoveDocument) {
+      onRemoveDocument(fileId);
+    }
   };
 
   return (
