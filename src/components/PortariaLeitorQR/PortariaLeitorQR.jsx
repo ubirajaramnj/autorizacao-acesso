@@ -114,6 +114,11 @@ const PortariaLeitorQR = () => {
   const registrarEntradaVisitante = async () => {
     if (!autorizacao) return;
 
+    if (documentosUploaded.length === 0) {
+      setError('⚠️ É necessário enviar pelo menos um documento de identificação');
+      return;
+    }
+
     setLoading(true);
     try {
       // 🆕 Payload atualizado com informações dos documentos
@@ -131,11 +136,12 @@ const PortariaLeitorQR = () => {
         
         // 🆕 Informações dos documentos enviados
         documentos: documentosUploaded.map(doc => ({
+          documentoId: doc.documentoId,
           nomeArquivo: doc.name,
           tipoArquivo: doc.type,
           tamanho: doc.size,
-          dataUpload: doc.uploadDate || new Date().toISOString(),
-          url: doc.url // Em produção, seria a URL do arquivo no servidor
+          url: doc.url, // Em produção, seria a URL do arquivo no servidor
+          dataUpload: doc.uploadDate || new Date().toISOString()
         })),
         
         // 🆕 Metadados adicionais

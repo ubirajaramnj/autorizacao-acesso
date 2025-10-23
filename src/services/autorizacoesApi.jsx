@@ -83,12 +83,13 @@ export const autorizacoesApi = {
       const payload = this.adaptarPayloadEntrada(dadosEntrada);
       const id = dadosEntrada.id
       
-      const response = await apiClient.post('/checkin', id);
+      const response = await apiClient.post('/autorizacoes/checkin', id);
       return {
         data: response.data,
         status: response.status
       };
     } catch (error) {
+      console.error('❌ Erro ao registrar entrada:', error);
       throw this.tratarErroApi(error, 'registrar entrada');
     }
   },
@@ -97,13 +98,15 @@ export const autorizacoesApi = {
   async uploadDocumento(file, autorizacaoId) {
     try {
       const formData = new FormData();
-      formData.append('documento', file);
+      formData.append('arquivo', file);
       formData.append('autorizacaoId', autorizacaoId);
+      formData.append('tipoDocumento', 'identificacao');
 
       const response = await apiClient.post('/documentos/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 30000, // 30 segundos para upload
       });
 
       return {
@@ -111,7 +114,11 @@ export const autorizacoesApi = {
         status: response.status
       };
     } catch (error) {
-      throw this.tratarErroApi(error, 'upload de documento');
+      console.error('❌ Erro no upload real:', error);
+      throw {
+        error: error.response?.data?.message || 'Erro no upload do arquivo',
+        status: error.response?.status || 500
+      };
     }
   },
 

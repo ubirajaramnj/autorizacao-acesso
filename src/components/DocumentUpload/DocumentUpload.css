@@ -102,6 +102,26 @@
   gap: 10px;
 }
 
+/* Adicione ao DocumentUpload.css */
+.file-status {
+  font-size: 0.8em;
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.uploading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-label.uploading {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
 .view-btn, .remove-btn {
   padding: 5px 10px;
   border: none;

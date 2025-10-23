@@ -1,5 +1,6 @@
 // src/components/DocumentUpload/DocumentUpload.jsx
 import React, { useState } from 'react';
+import { autorizacoesApi } from "../../services/autorizacoesApi";
 import './DocumentUpload.css';
 
 const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemoveDocument }) => {
@@ -25,14 +26,22 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemov
           throw new Error('Arquivo muito grande. Máximo 5MB');
         }
 
+        console.log('📤 Iniciando upload real do arquivo:', file.name);
+        // 🆕 UPLOAD REAL PARA O BACKEND
+        const uploadResponse = await autorizacoesApi.uploadDocumento(file, autorizacaoId);
+        console.log('✅ Upload realizado com sucesso:', uploadResponse);
+
         // 🆕 CORREÇÃO: Criar fileInfo com ID único
         const fileInfo = {
-          id: Date.now() + Math.random(), // ID único
+          id: uploadResponse.data.id || Date.now(),
           name: file.name,
           type: file.type,
           size: file.size,
-          url: URL.createObjectURL(file),
-          uploadDate: new Date().toISOString()
+          url: uploadResponse.data.url, // 🆕 URL REAL do servidor
+          uploadDate: new Date().toISOString(),
+          // 🆕 Dados adicionais do backend
+          documentoId: uploadResponse.data.documentoId,
+          path: uploadResponse.data.path
         };
 
         setUploadedFiles(prev => [...prev, fileInfo]);
@@ -43,7 +52,7 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemov
         }
       }
     } catch (error) {
-      console.error('Erro no upload:', error);
+      console.error('❌ Erro no upload real:', error);
       if (onUploadError) {
         onUploadError(error.message);
       }
@@ -52,9 +61,15 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemov
     }
   };
 
-   const removeFile = (fileId) => {
+   const removeFile = async (fileId) => {
+    // 🆕 Opcional: Chamar API para remover arquivo do backend
+    try {
+      // await autorizacoesApi.removerDocumento(fileId);
+    } catch (error) {
+      console.error('Erro ao remover documento:', error);
+    }
+    
     setUploadedFiles(prev => prev.filter(file => file.id !== fileId));
-    // 🆕 CORREÇÃO: Chamar onRemoveDocument se existir
     if (onRemoveDocument) {
       onRemoveDocument(fileId);
     }
@@ -101,6 +116,7 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemov
               <div className="file-info">
                 <span className="file-name">{file.name}</span>
                 <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                <span className="file-status">✅ Enviado</span>
               </div>
               <div className="file-actions">
                 <a 
