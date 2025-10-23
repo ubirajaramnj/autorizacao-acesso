@@ -140,7 +140,7 @@ const PortariaLeitorQR = () => {
           nomeArquivo: doc.name,
           tipoArquivo: doc.type,
           tamanho: doc.size,
-          url: doc.url, // Em produção, seria a URL do arquivo no servidor
+          url: doc.link, // Em produção, seria a URL do arquivo no servidor
           dataUpload: doc.uploadDate || new Date().toISOString()
         })),
         

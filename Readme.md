@@ -4,7 +4,7 @@
 
 Sistema web desenvolvido em React para cadastro de visitantes e prestadores de serviço em condomínios ou empresas. O sistema gera um QR Code para validação na portaria e oferece um comprovante de impressão profissional.
 
-**✨ Destaque:** Sistema completo com frontend, sistema de portaria e integração com API real.
+**✨ Destaque:** Sistema completo com frontend, sistema de portaria, upload de documentos e integração completa com API real.
 
 ## 🚀 Funcionalidades
 
@@ -13,20 +13,21 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Períodos Flexíveis**: Dia único ou intervalo de datas
 - **Validação por QR Code**: Geração automática de QR Code para portaria
 - **Sistema de Portaria**: Leitor QR Code integrado com registro de entrada
-- **Upload de Documentos**: Anexar imagens e PDFs dos visitantes
+- **Upload de Documentos**: Upload real de imagens e PDFs para o backend
+- **Registro Completo**: Entrada registrada com documentação anexada
 - **Comprovante de Impressão**: Layout otimizado para impressão
 - **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
 - **Máscaras Inteligentes**: CPF, CNPJ, telefone e RG formatados automaticamente
-- **Otimização Mobile**: Teclado numérico, áreas de toque ampliadas, UX refinada
 
-### 🎯 Fluxo do Sistema
+### 🎯 Fluxo do Sistema Completo
 1. **Cadastro**: Preenchimento do formulário com dados pessoais
 2. **Validação**: Verificação automática dos campos obrigatórios
 3. **QR Code**: Geração do código com link da API para validação
-4. **Portaria**: Leitura do QR Code e registro de entrada
-5. **Upload**: Captura de documentos na portaria
-6. **Comprovante**: Impressão do recibo com todos os dados
+4. **Portaria**: Leitura do QR Code e verificação dos dados
+5. **Upload de Documentos**: Captura e envio real de documentos para o backend
+6. **Registro de Entrada**: Check-in com timestamp e documentação
+7. **Comprovante**: Registro completo com todos os dados
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -81,6 +82,7 @@ form-cadastro/
 │   ├── services/
 │   │   ├── api.js (serviço híbrido mock/real)
 │   │   ├── realApi.js (integração com API real)
+│   │   ├── autorizacoesApi.js (serviços de autorizações)
 │   │   └── apiService.js (gerenciador de serviços)
 │   ├── utils/
 │   │   └── masks.js (utilitários de máscaras)
@@ -145,29 +147,38 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - Clique em "Cadastrar"
 - **QR Code gerado** com link da API
 
-### 2. Sistema de Portaria
+### 2. Sistema de Portaria com Upload de Documentos
 - Acesse: `http://localhost:3000/portaria`
 - Clique em "Ler QR Code" ou cole o link manualmente
-- **Sistema busca dados** da API real ou mock
+- **Sistema busca dados** da API real
 - Verifique os dados do visitante
-- Faça **upload de documentos** (opcional)
+- **Faça upload de documentos** (obrigatório) - imagens ou PDF
 - Clique em "Registrar Entrada"
+- **Sistema envia documentos** para o backend e registra check-in
 
 ### 3. Validação na Portaria
 - Apresente o QR Code gerado
 - A portaria escaneia o código
 - Sistema consulta API em tempo real
+- Documentos são enviados e armazenados no servidor
 - Acesso liberado conforme período autorizado
 
-## 🔄 Sistema Híbrido de API
+## 🔄 Sistema de Upload de Documentos
 
-### 🎯 Funcionamento Inteligente
-- **Mock Local**: Dados persistem no localStorage para desenvolvimento
-- **API Real**: Integração com backend real em produção
-- **Fallback Automático**: Se API real falhar, usa mock automaticamente
-- **Mesma Interface**: Componentes não precisam de alterações
+### 🎯 Funcionamento do Upload
+- **Upload Real**: Arquivos são enviados para o backend via FormData
+- **Validação**: Apenas imagens (JPG, PNG) e PDFs, máximo 5MB
+- **Obrigatório**: Pelo menos um documento necessário para registro
+- **Armazenamento**: URLs reais do servidor no banco de dados
+- **Segurança**: Validação de tipo e tamanho no frontend e backend
 
-### 🔧 Configuração de API
+### 📤 Endpoints de Documentos
+- `POST /api/documentos/upload` - Upload de arquivos
+- Payload: `FormData` com arquivo + `autorizacaoId`
+- Retorno: URL real do arquivo no servidor + ID do documento
+
+## 🔧 Configuração de API
+
 ```env
 # Usar API real (true/false)
 VITE_USE_REAL_API=true
@@ -177,12 +188,16 @@ VITE_API_URL=https://condominio-api-itac.konsilo.online/api
 
 # Porta da aplicação
 VITE_PORT=3000
+
+# Configurações de Upload
+VITE_MAX_FILE_SIZE=5242880
+VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/jpg,application/pdf
 ```
 
 ### 📡 Endpoints da API Real
 - `POST /api/autorizacoes` - Criar autorização
 - `GET /api/autorizacoes/{id}` - Buscar autorização por ID
-- `POST /api/entradas` - Registrar entrada
+- `POST /api/checkins` - Registrar entrada com documentos
 - `POST /api/documentos/upload` - Upload de documentos
 
 ## 📊 Funcionalidades Detalhadas
@@ -196,26 +211,21 @@ VITE_PORT=3000
   - CNPJ: `00.000.000/0000-00`
   - RG: `000.000.000-0` (9-10 dígitos)
 
-### 📱 Sistema de Portaria
+### 📱 Sistema de Portaria Avançado
 - **Leitor QR Code**: Scanner com câmera traseira
 - **Busca Manual**: Input para colar link ou ID
-- **Upload de Documentos**: Suporte a imagens e PDF (até 5MB)
-- **Registro de Entrada**: Timestamp automático
-- **Interface Otimizada**: Design focado em produtividade
+- **Upload de Documentos**: Upload real para backend com progresso
+- **Validação de Documentos**: Exige pelo menos um documento para registro
+- **Registro de Entrada**: Timestamp automático com documentação
+- **Interface Otimizada**: Design focado em produtividade da portaria
 
-### 🔒 Persistência de Dados
-- **LocalStorage**: Dados persistem entre recarregamentos
-- **UUID**: Identificadores únicos para evitar conflitos
-- **Export/Import**: Backup e restauração de dados
-- **Dados de Teste**: Geração automática para desenvolvimento
-
-### 📱 Otimização Mobile Avançada
-- **Teclado Numérico**: Para CPF, RG e CNPJ
-- **Áreas de Toque Ampliadas**: Botões e inputs fáceis de tocar
-- **Radio Buttons Customizados**: Visíveis e intuitivos em todos os dispositivos
-- **Campos de Data Otimizados**: Ícone claro e área de toque ampliada
-- **Prevenção de Cache**: Meta tags e estratégias anti-cache
-- **Font Size 16px**: Previne zoom automático no iOS
+### 🔒 Sistema de Upload Seguro
+- **Validação Dupla**: Frontend e backend
+- **Tipos Permitidos**: JPG, PNG, PDF
+- **Tamanho Máximo**: 5MB por arquivo
+- **Múltiplos Arquivos**: Suporte a vários documentos
+- **URLs Reais**: Arquivos armazenados no servidor
+- **Progresso Visual**: Feedback durante o upload
 
 ## 🔧 Desenvolvimento
 
@@ -236,16 +246,21 @@ npm run preview       # Preview do build de produção
 npm start            # Alias para npm run dev
 npm run start:port   # Porta customizada: VITE_PORT=4000 npm run start:port
 
-# Utilitários de desenvolvimento
+# Utilitários
 npm run test:api     # Testar conexão com API real
+npm run test:upload  # Testar funcionalidade de upload
 ```
 
 ### Variáveis de Ambiente
 
 ```env
 # API Configuration
-VITE_USE_REAL_API=false
+VITE_USE_REAL_API=true
 VITE_API_URL=https://condominio-api-itac.konsilo.online/api
+
+# Upload Configuration
+VITE_MAX_FILE_SIZE=5242880
+VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/jpg,application/pdf
 
 # Application
 VITE_PORT=3000
@@ -255,218 +270,114 @@ VITE_APP_NAME="Sistema de Acesso"
 APP_PORT=3000
 ```
 
-### Configuração de Portas Flexíveis
-
-```bash
-# Desenvolvimento local
-VITE_PORT=4000 npm run dev
-
-# Docker com porta customizada
-VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
-
-# API real em produção
-VITE_USE_REAL_API=true VITE_API_URL=https://sua-api.com/api npm run build
-```
-
 ## 🐛 Solução de Problemas
 
-### Erros Comuns
+### Problemas Comuns de Upload
 
-**Porta ocupada:**
-```bash
-# Linux/Mac
-sudo lsof -t -i tcp:3000 | xargs kill -9
+**Upload falha:**
+- Verifique tamanho do arquivo (máx. 5MB)
+- Confirme tipo do arquivo (apenas JPG, PNG, PDF)
+- Verifique conexão com a internet
 
-# Windows
-netstat -ano | findstr :3000
-taskkill /PID <PID> /F
-```
+**Documento não anexado:**
+- Certifique-se de que pelo menos um documento foi enviado
+- Verifique se o upload foi concluído com sucesso
+- Confirme permissões da câmera/documentos no navegador
 
 **Problemas com QR Scanner:**
 - Certifique-se de que o HTTPS está habilitado em produção
 - Verifique as permissões da câmera no navegador
 - Use o modo de busca manual como alternativa
 
-**API Real Indisponível:**
-- Sistema automaticamente usa mock local
-- Dados são mantidos no localStorage
-- Funcionalidade completa preservada
-
-**Problemas com Docker:**
-```bash
-docker-compose down
-docker system prune -f
-docker-compose up --build
-```
-
-## 📦 Build para Produção
-
-### Com Vite
-```bash
-# Build para produção
-npm run build
-
-# Preview do build
-npm run preview
-```
-
-### Com Docker
-```bash
-# Build e execução
-docker-compose up --build
-
-# Apenas build
-docker-compose build
-```
-
-## 🚀 Deploy
-
-### Opção 1: Servidor Web Estático
-- Execute `npm run build`
-- Sirva a pasta `dist/` com seu servidor web (Nginx, Apache)
-
-### Opção 2: Container Docker
-- Build da imagem Docker
-- Deploy em qualquer serviço de containers (Kubernetes, ECS)
-
-### Opção 3: Plataformas Cloud
-- **Netlify/Vercel**: Deploy automático do build estático
-- **AWS S3 + CloudFront**: Hospedagem estática com CDN
-- **Heroku**: Deploy com container Docker
-
-### Configuração de Produção
-```env
-VITE_USE_REAL_API=true
-VITE_API_URL=https://sua-api-real.com/api
-VITE_PORT=443
-NODE_ENV=production
-```
-
-## 🔒 Segurança e Validações
-
-- Validação de formato de email
-- Verificação de CPF/CNPJ (formato)
-- Prevenção de datas retroativas
-- Sanitização de entradas
-- Validação de períodos lógicos
-- Campos obrigatórios: Nome, Telefone, CPF, RG
-- Upload seguro de documentos com validação de tipo e tamanho
-
-## 📱 Responsividade
-
-O sistema é totalmente responsivo e foi otimizado para:
-
-### ✅ Desktop (1920x1080+)
-- Layout tradicional com formulário centralizado
-- Campos lado a lado quando apropriado
-- Navegação por abas entre cadastro/portaria
-
-### ✅ Tablet (768x1024)
-- Layout adaptativo
-- Radio buttons em coluna
-- Áreas de toque adequadas
-- Scanner QR em tamanho otimizado
-
-### ✅ Mobile (375x667)
-- **Teclado numérico** para campos de documento
-- **Áreas de toque ampliadas** (min-height: 44px)
-- **Radio buttons customizados** visíveis e claros
-- **Campos de data** com ícone e placeholder intuitivos
-- **Scanner QR** em tela cheia quando ativado
-- **Prevenção de zoom** automático no iOS
-
-### ✅ Impressão (layout otimizado)
-- Comprovante profissional
-- QR Code incluído
-- Informações completas
-- Design limpo e legível
-
 ## 🔄 Melhorias Recentes
+
+### 🎯 Versão 4.0.0 - Upload Real de Documentos
+- ✅ **Upload Real** - Arquivos enviados para backend via FormData
+- ✅ **Validação Avançada** - Tipos e tamanhos de arquivo
+- ✅ **URLs Reais** - Documentos armazenados no servidor
+- ✅ **Registro Completo** - Check-in com documentação anexada
+- ✅ **Progresso de Upload** - Feedback visual durante envio
+- ✅ **Validação Obrigatória** - Exige documentos para registro
 
 ### 🎯 Versão 3.0.0 - Sistema Completo
 - ✅ **Sistema de Portaria** - Leitor QR Code integrado
 - ✅ **Upload de Documentos** - Suporte a imagens e PDF
 - ✅ **API Híbrida** - Mock local + API real com fallback
 - ✅ **Persistência de Dados** - LocalStorage com UUID
-- ✅ **Interface Unificada** - Navegação entre cadastro/portaria
 
 ### 🎯 Versão 2.0.0 - Migração para Vite
-- ✅ **Migração de react-scripts para Vite** - Performance drasticamente melhorada
+- ✅ **Migração para Vite** - Performance drasticamente melhorada
 - ✅ **Builds mais rápidos** - Desenvolvimento e produção
-- ✅ **HMR instantâneo** - Atualizações em tempo real sem refresh
-- ✅ **Configuração simplificada** - Vite config mais enxuto
+- ✅ **HMR instantâneo** - Atualizações em tempo real
 
-### 🎯 Versão 1.1.0 - Otimização Mobile
-- ✅ Teclado numérico para CPF, RG e CNPJ
-- ✅ Radio buttons visíveis em todos os dispositivos
-- ✅ Campos de data com UX melhorada
-- ✅ Prevenção de cache em mobile
-- ✅ Áreas de toque ampliadas
-- ✅ Validações compatíveis com máscaras
+## 📊 Payload de Check-in com Documentos
+
+```json
+{
+  "autorizacaoId": "d0a7fd1e-76da-45a7-870f-22c56958dfc1",
+  "nome": "UBIRAJARA JR",
+  "tipo": "Visitante",
+  "cpf": "10706404769",
+  "rg": "3424332432",
+  "periodo": "Unico",
+  "dataInicio": "2025-10-24",
+  "dataFim": "2025-10-24",
+  "portariaResponsavel": "Funcionário Portaria",
+  "documentos": [
+    {
+      "documentoId": "12345",
+      "nomeArquivo": "documento.png",
+      "tipoArquivo": "image/png",
+      "tamanho": 144731,
+      "url": "https://api.com/documentos/12345.png",
+      "dataUpload": "2025-10-22T21:24:33.064Z"
+    }
+  ],
+  "dataHoraEntrada": "2025-10-22T21:24:54.089Z",
+  "tipoRegistro": "entrada_com_documentacao"
+}
+```
 
 ## 👥 Próximas Melhorias
 
 - [ ] **Dashboard Administrativo** - Estatísticas e relatórios
-- [ ] **Notificações em Tempo Real** - WebSocket para atualizações
-- [ ] **Biometria Facial** - Reconhecimento facial na portaria
-- [ ] **Relatórios Avançados** - Analytics e métricas de acesso
-- [ ] **Sistema Multi-Condomínio** - Suporte a múltiplas unidades
-- [ ] **App Mobile** - Versão nativa para iOS e Android
-- [ ] **Integração com Câmeras** - Captura automática na entrada
+- [ ] **Visualização de Documentos** - Preview integrado
+- [ ] **OCR de Documentos** - Leitura automática de dados
+- [ ] **Assinatura Digital** - Captura de assinatura na portaria
+- [ ] **Relatórios Avançados** - Analytics de acesso e documentos
+- [ ] **Sistema de Backup** - Backup automático de documentos
 
-## 🛠 API e Desenvolvimento
+## 🛠 Para Desenvolvedores
 
-### Para Desenvolvedores
-
-**Estrutura de Serviços:**
+### Estrutura de Serviços de Upload
 ```javascript
-// Uso nos componentes
-import { apiService } from './services/apiService';
+// Upload real de documentos
+const response = await autorizacoesApi.uploadDocumentoReal(file, autorizacaoId);
 
-// O serviço decide automaticamente entre mock e API real
-const response = await apiService.cadastrarVisitante(dados);
-const autorizacao = await apiService.buscarAutorizacaoPorId(id);
+// Registro de entrada com documentos
+const checkinResponse = await autorizacoesApi.registrarEntradaComDocumentos(payload);
 ```
 
-**Extensão da API:**
+### Extensão da API
 ```javascript
-// Adicione novos endpoints em realApi.js
-async novoEndpoint(dados) {
-  const response = await apiClient.post('/novo-endpoint', dados);
+// Adicione novos endpoints em autorizacoesApi.js
+async uploadDocumentoReal(file, autorizacaoId) {
+  const formData = new FormData();
+  formData.append('documento', file);
+  formData.append('autorizacaoId', autorizacaoId);
+  
+  const response = await apiClient.post('/documentos/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  
   return response.data;
 }
 ```
-
-## 👥 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-### Guidelines de Contribuição
-- Mantenha a compatibilidade com o sistema híbrido de API
-- Adicione testes para novas funcionalidades
-- Documente novas variáveis de ambiente
-- Mantenha a responsividade mobile
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-1. Verifique a seção de troubleshooting
-2. Consulte os issues abertos no repositório
-3. Crie um novo issue com detalhes do problema
-4. Para suporte técnico: [email/contato]
 
 ---
 
 **Desenvolvido com ❤️ para simplificar o cadastro e controle de acesso em condomínios e empresas.**
 
-**🎉 Sistema 100% funcional com frontend, portaria e integração API real!**
+**🎉 Sistema 100% funcional com upload real de documentos e integração completa com API!**
 
-**🏗️ Arquitetura escalável preparada para produção**
+**📁 Documentos seguros e acessíveis via URLs reais do servidor**
