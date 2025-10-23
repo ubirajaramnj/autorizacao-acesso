@@ -37,11 +37,11 @@ const DocumentUpload = ({ autorizacaoId, onUploadSuccess, onUploadError, onRemov
           name: file.name,
           type: file.type,
           size: file.size,
-          url: uploadResponse.data.url, // 🆕 URL REAL do servidor
+          url: uploadResponse.data.link, // 🆕 URL REAL do servidor
           uploadDate: new Date().toISOString(),
           // 🆕 Dados adicionais do backend
           documentoId: uploadResponse.data.documentoId,
-          path: uploadResponse.data.path
+          path: uploadResponse.data.link
         };
 
         setUploadedFiles(prev => [...prev, fileInfo]);

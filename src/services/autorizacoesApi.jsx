@@ -80,10 +80,10 @@ export const autorizacoesApi = {
   // Registrar entrada
   async registrarEntrada(dadosEntrada) {
     try {
-      const payload = this.adaptarPayloadEntrada(dadosEntrada);
-      const id = dadosEntrada.id
+      //const payload = this.adaptarPayloadEntrada(dadosEntrada);
       
-      const response = await apiClient.post('/autorizacoes/checkin', id);
+      const response = 
+        await apiClient.post(`/autorizacoes/${dadosEntrada.autorizacaoId}/checkin`, dadosEntrada);
       return {
         data: response.data,
         status: response.status
@@ -169,14 +169,6 @@ export const autorizacoesApi = {
   adaptarPayloadEntrada(dados) {
     return {
       autorizacaoId: dados.autorizacaoId,
-      nome: dados.nome,
-      tipo: dados.tipo,
-      cpf: dados.cpf,
-      rg: dados.rg,
-      empresa: dados.empresa || null,
-      periodo: dados.periodo,
-      dataInicio: dados.dataInicio,
-      dataFim: dados.dataFim,
       portariaResponsavel: dados.portariaResponsavel,
       dataHoraEntrada: new Date().toISOString(),
       status: 'entrada_registrada'

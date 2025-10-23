@@ -112,8 +112,12 @@ const PortariaLeitorQR = () => {
   };
 
   const registrarEntradaVisitante = async () => {
+    console.log('Iniciando registro de entrada.');
     if (!autorizacao) return;
 
+    console.log('Autorizaçao OK.');
+
+    console.log(documentosUploaded);
     if (documentosUploaded.length === 0) {
       setError('⚠️ É necessário enviar pelo menos um documento de identificação');
       return;
@@ -122,35 +126,14 @@ const PortariaLeitorQR = () => {
     setLoading(true);
     try {
       // 🆕 Payload atualizado com informações dos documentos
-      const dadosEntrada = {
+      const checkIn = {
         autorizacaoId: autorizacao.id,
-        nome: autorizacao.nome,
-        tipo: autorizacao.tipo,
-        cpf: autorizacao.cpf,
-        rg: autorizacao.rg,
-        empresa: autorizacao.empresa,
-        periodo: autorizacao.periodo,
-        dataInicio: autorizacao.dataInicio,
-        dataFim: autorizacao.dataFim,
         portariaResponsavel: 'Funcionário Portaria', // Em produção, pegar do login
-        
-        // 🆕 Informações dos documentos enviados
-        documentos: documentosUploaded.map(doc => ({
-          documentoId: doc.documentoId,
-          nomeArquivo: doc.name,
-          tipoArquivo: doc.type,
-          tamanho: doc.size,
-          url: doc.link, // Em produção, seria a URL do arquivo no servidor
-          dataUpload: doc.uploadDate || new Date().toISOString()
-        })),
-        
-        // 🆕 Metadados adicionais
-        dataHoraEntrada: new Date().toISOString(),
-        tipoRegistro: 'entrada_com_documentacao'
+        documentoId: documentosUploaded[0].documentoId
       };
 
-      console.log('📤 Enviando dados de entrada:', dadosEntrada);
-      await autorizacoesApi.registrarEntrada(dadosEntrada);
+      console.log('📤 Enviando dados de entrada:', checkIn);
+      await autorizacoesApi.registrarEntrada(checkIn);
       console.log('✅ Resposta do backend:', response);
 
       setEntradaRegistrada(true);
