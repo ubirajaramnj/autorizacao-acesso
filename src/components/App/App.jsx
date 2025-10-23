@@ -15,11 +15,13 @@ function App() {
         <div className="container">
           {/* Logo acima do título */}
           <div className="logo-container">
-            <img 
-              src="/LogoSolar.jpg" 
-              alt="Logo Solar" 
-              className="logo"
-            />
+            <div className="logo-wrapper">
+              <img 
+                src="/LogoSolar.jpg" 
+                alt="Logo Solar" 
+                className="logo"
+              />
+            </div>
           </div>
           <h1>Sistema de Cadastro</h1>
           <Routes>
