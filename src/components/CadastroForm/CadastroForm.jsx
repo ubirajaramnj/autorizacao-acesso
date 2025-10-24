@@ -10,12 +10,12 @@ import {
   removeMask,
 } from "../../utils/masks";
 import { 
-  parseLocalDate, 
   getTodayLocal, 
   getTodayLocalString,
   isDateValid,
   compareDates
 } from '../../utils/dateFormat';
+import Loader from '../Loader/Loader';
 import QRCodeDisplay from "../QRCodeDisplay/QRCodeDisplay";
 import ConfirmacaoAutorizacao from "../ConfirmacaoAutorizacao/ConfirmacaoAutorizacao";
 import "./CadastroForm.css";
@@ -40,7 +40,8 @@ const CadastroForm = () => {
     dataInicio: getTodayLocalString(),
     dataFim: "",
   });
-
+  
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -207,6 +208,7 @@ const CadastroForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     setMessage("");
     setQrCodeData(null);
 
@@ -244,7 +246,18 @@ const CadastroForm = () => {
   };
 
   const handleConfirmarAutorizacao = async () => {
+    setLoading(true);
     setIsSubmitting(true);
+
+    // 🆕 SIMULAÇÃO: Timeout de 60 segundos para testar o loader
+    console.log('⏱️ Iniciando simulação de 60 segundos...');
+    
+    // await new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     console.log('✅ Simulação concluída após 60 segundos');
+    //     resolve();
+    //   }, 600000); // 60 segundos
+    // });
 
     try {
       // Preparar dados completos para envio
@@ -289,6 +302,7 @@ const CadastroForm = () => {
     } finally {
       setIsSubmitting(false);
       setShowConfirmacao(false);
+      setLoading(false);
     }
   };
 
@@ -303,6 +317,7 @@ const CadastroForm = () => {
 
   return (
     <div className="cadastro-form">
+      {loading && <Loader logoSize="large" message="Realizando cadastro..." />}
       {dadosAutorizador.nome && (
         <div className="autorizador-info">
           <h3>Autorização de: {dadosAutorizador.nome}</h3>

@@ -3,15 +3,9 @@ import React, { useState, useRef, useCallback } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { autorizacoesApi } from "../../services/autorizacoesApi";
 import DocumentUpload from "../DocumentUpload/DocumentUpload";
+import Loader from '../Loader/Loader';
 import "./PortariaLeitorQR.css";
 import { formatDateToDisplay } from '../../utils/dateFormat';
-import {
-  maskTelefone,
-  maskCNPJ,
-  maskCPF,
-  maskRG,
-  removeMask,
-} from "../../utils/masks";
 
 const PortariaLeitorQR = () => {
   const [scanning, setScanning] = useState(false);
@@ -85,12 +79,14 @@ const PortariaLeitorQR = () => {
 
   // 🆕 ATUALIZADA: Função para lidar com upload de documentos
   const handleDocumentUpload = (fileInfo) => {
+    setLoading(true);
     console.log('📄 Documento recebido no handleDocumentUpload:', fileInfo);
     
     // 🆕 CORREÇÃO: Usar função de atualização de estado correta
     setDocumentosUploaded(prev => {
       const novosDocumentos = [...prev, fileInfo];
       console.log('📋 Nova lista de documentos:', novosDocumentos);
+      setLoading(false);
       return novosDocumentos;
     });
     
@@ -195,7 +191,8 @@ const PortariaLeitorQR = () => {
           🐛 Debug
         </button>
       )}
-
+      
+      {loading && <Loader logoSize="large" message="Realizando cadastro..." />}
       <header className="portaria-header">
         <h1>🏢 Sistema de Portaria</h1>
         <p>Leia o QR Code ou digite o ID manualmente</p>
