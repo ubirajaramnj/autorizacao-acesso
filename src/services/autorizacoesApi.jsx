@@ -122,6 +122,38 @@ export const autorizacoesApi = {
       };
     }
   },
+  
+  // 🆕 Upload do PDF para o backend
+  async salvarComprovantePDF(autorizacaoId, pdfBlob, nomeArquivo) {
+    const formData = new FormData();
+    pdfBlob.name = nomeArquivo;
+    pdfBlob.filename = nomeArquivo;
+
+    formData.append('arquivo', pdfBlob);
+    formData.append('autorizacaoId', autorizacaoId);
+    
+    const response = await apiClient.post('/comprovantes/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 30000,
+    });
+    
+    return response.data;
+  },
+
+  // 🆕 Buscar comprovante por ID da autorização
+  async buscarComprovante(autorizacaoId) {
+    const response = await apiClient.get(`/comprovantes/${autorizacaoId}`);
+    return response.data;
+  },
+
+  // 🆕 Listar todos os comprovantes
+  async listarComprovantes(filtros = {}) {
+    const params = new URLSearchParams(filtros);
+    const response = await apiClient.get(`/comprovantes?${params}`);
+    return response.data;
+  },
 
   // 🎯 ADAPTAÇÃO DOS PAYLOADS
   adaptarPayloadCriacao(dados) {

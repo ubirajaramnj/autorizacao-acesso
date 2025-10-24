@@ -150,4 +150,38 @@
   background-color: #5a6268;
 }
 
-/* Adicione estas regras ao seu QRCodeDisplay.css existente */
+/* 🆕 ESTILOS PARA STATUS DE SALVAMENTO AUTOMÁTICO */
+.salvamento-status {
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 5px 0;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.salvamento-status.salvando {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.salvamento-status.sucesso {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.salvamento-status.erro {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+/* Ajuste no header para acomodar o status */
+.qr-code-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

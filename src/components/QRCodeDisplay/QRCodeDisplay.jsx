@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 import { 
   applyDocumentMask, 
@@ -8,11 +8,26 @@ import {
   formatCPF, 
   formatCNPJ } from '../../utils/masks';
 import './QRCodeDisplay.css';
-import ComprovantePDF from '../ComprovantePDF/ComprovantePDF';
 import { formatDateToDisplay } from '../../utils/dateFormat';
+import { autorizacoesApi } from "../../services/autorizacoesApi";
 
 const QRCodeDisplay = ({ data, onClose }) => {
   if (!data) return null;
+
+  // 🆕 ESTADO PARA CONTROLE DO SALVAMENTO AUTOMÁTICO
+  const [salvamentoStatus, setSalvamentoStatus] = useState({
+    salvando: false,
+    sucesso: false,
+    erro: false,
+    mensagem: ''
+  });
+
+  // 🆕 EFFECT PARA SALVAR AUTOMATICAMENTE AO MONTAR O COMPONENTE
+  useEffect(() => {
+    if (data && data.id) {
+      salvarPDFAutomaticamente();
+    }
+  }, [data]);
 
   // Formatar o documento para exibição
   const formatDocumentForDisplay = (document) => {
@@ -56,9 +71,371 @@ const QRCodeDisplay = ({ data, onClose }) => {
 
   console.log('QR Code gerado:', qrData); // Para debug
 
-  // SUBSTITUA A FUNÇÃO handlePrint NO SEU QRCodeDisplay.jsx:
+   // 🆕 FUNÇÃO CORRIGIDA PARA GERAR PDF COMO BLOB
+  const gerarPDFComoBlob = async () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Importar as bibliotecas necessárias
+        const { default: html2canvas } = await import('html2canvas');
+        const { default: jsPDF } = await import('jspdf');
+        
+        // Criar um elemento temporário para renderizar o comprovante
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'fixed';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '0';
+        tempDiv.style.width = '800px';
+        tempDiv.style.background = 'white';
+        tempDiv.style.padding = '20px';
+        tempDiv.style.zIndex = '-1000';
+        
+        // Adicionar o HTML do comprovante ao elemento temporário
+        tempDiv.innerHTML = `
+          <div class="comprovante-container" style="
+            max-width: 100%;
+            margin: 0 auto;
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            font-family: Arial, sans-serif;
+            color: #000;
+            font-size: 12px;
+          ">
+            <div class="comprovante-header" style="
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 15px;
+              padding-bottom: 10px;
+              border-bottom: 2px solid #2c3e50;
+            ">
+              <div class="logo-section" style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                <div class="logo-text" style="
+                  font-size: 36px;
+                  background: #3498db;
+                  color: white;
+                  width: 60px;
+                  height: 60px;
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex-shrink: 0;
+                ">🏢</div>
+                <div class="header-text">
+                  <h1 style="margin: 0; color: #2c3e50; font-size: 18px; font-weight: bold; line-height: 1.2;">
+                    Autorização de Acesso
+                  </h1>
+                  <p style="margin: 3px 0 0 0; color: #7f8c8d; font-size: 11px;">
+                    Sistema de Cadastro - Visitantes e Prestadores
+                  </p>
+                </div>
+              </div>
+              <div class="comprovante-id" style="
+                background: #f8f9fa;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-size: 10px;
+                color: #6c757d;
+                border: 1px solid #e9ecef;
+                white-space: nowrap;
+                margin-left: 10px;
+              ">
+                ID: ${data.id}
+              </div>
+            </div>
+            
+            <div class="comprovante-divider" style="
+              height: 2px;
+              background: linear-gradient(90deg, #3498db, #9b59b6);
+              margin: 12px 0;
+              border-radius: 1px;
+            "></div>
 
-  // SUBSTITUA A FUNÇÃO handlePrint NO SEU QRCodeDisplay.jsx:
+            <div class="comprovante-content" style="
+              display: grid;
+              grid-template-columns: 1fr 140px;
+              gap: 25px;
+              margin-bottom: 20px;
+              align-items: start;
+            ">
+              <div class="comprovante-info">
+                <h2 style="
+                  color: #2c3e50;
+                  margin-bottom: 12px;
+                  font-size: 14px;
+                  border-bottom: 1px solid #3498db;
+                  padding-bottom: 3px;
+                ">Dados do Cadastro</h2>
+                <table class="comprovante-table" style="
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-bottom: 15px;
+                  font-size: 11px;
+                ">
+                  <tbody>
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>Nome:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${data.nome}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>Tipo:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        <span class="tipo-badge ${data.tipo.toLowerCase()}" style="
+                          padding: 3px 6px;
+                          border-radius: 8px;
+                          font-size: 9px;
+                          font-weight: 600;
+                          display: inline-block;
+                          background: ${data.tipo === 'Visitante' ? '#e8f4fd' : '#f4ecf7'};
+                          color: ${data.tipo === 'Visitante' ? '#3498db' : '#8e44ad'};
+                        ">
+                          ${data.tipo === 'Visitante' ? '👤 Visitante' : '👷 Prestador de Serviço'}
+                        </span>
+                      </td>
+                    </tr>
+                    ${data.empresa ? `
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>Empresa:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${data.empresa}
+                      </td>
+                    </tr>
+                    ` : ''}
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>CPF:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${formatCPF(data.cpf)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>RG:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${formatRG(data.rg)}
+                      </td>
+                    </tr>
+                    ${data.cnpj ? `
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>CNPJ:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${formatCNPJ(data.cnpj)}
+                      </td>
+                    </tr>
+                    ` : ''}
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>Período:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${data.periodo === 'unico' 
+                          ? `Dia único: ${formatDateToDisplay(data.dataInicio)}`
+                          : `De ${formatDateToDisplay(data.dataInicio)} até ${formatDateToDisplay(data.dataFim)}`
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2; width: 120px; font-weight: bold; color: #2c3e50;">
+                        <strong>Data do Cadastro:</strong>
+                      </td>
+                      <td style="padding: 6px 4px; vertical-align: top; border-bottom: 1px solid #eee; line-height: 1.2;">
+                        ${new Date().toLocaleString('pt-BR')}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="observacoes-section" style="
+                  margin-top: 15px;
+                  background: #fff3cd;
+                  border: 1px solid #ffeaa7;
+                  border-radius: 4px;
+                  padding: 12px;
+                ">
+                  <h3 style="color: #856404; margin: 0 0 8px 0; font-size: 12px;">Observações:</h3>
+                  <ul style="margin: 0; padding-left: 12px; color: #856404;">
+                    <li style="margin-bottom: 4px; line-height: 1.2; font-size: 10px;">
+                      Este comprovante deve ser apresentado na portaria junto com documento de identificação
+                    </li>
+                    <li style="margin-bottom: 4px; line-height: 1.2; font-size: 10px;">
+                      O acesso está sujeito à confirmação dos dados pela portaria
+                    </li>
+                    <li style="margin-bottom: 4px; line-height: 1.2; font-size: 10px;">
+                      Em caso de dúvidas, entre em contato com a administração
+                    </li>
+                    ${data.periodo === 'unico' ? 
+                      `<li style="margin-bottom: 4px; line-height: 1.2; font-size: 10px;">
+                        Válido apenas para o dia ${formatDateToDisplay(data.dataInicio)}
+                      </li>` : 
+                      `<li style="margin-bottom: 4px; line-height: 1.2; font-size: 10px;">
+                        Válido no período de ${formatDateToDisplay(data.dataInicio)} a ${formatDateToDisplay(data.dataFim)}
+                      </li>`
+                    }
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="comprovante-qrcode" style="
+                text-align: center;
+                padding: 12px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+                height: fit-content;
+              ">
+                <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 12px;">
+                  QR Code para Validação
+                </h3>
+                <div class="qrcode-print" style="margin: 8px 0; display: flex; justify-content: center;">
+                  <img src="${`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}`}" 
+                      alt="QR Code para validação" 
+                      style="width: 120px; height: 120px;" />
+                </div>
+                <p class="comprovante-instruction" style="
+                  font-style: italic;
+                  color: #666;
+                  margin: 8px 0 0 0;
+                  font-size: 9px;
+                  line-height: 1.2;
+                ">
+                  Apresente este QR Code na portaria<br />
+                  para validação do acesso
+                </p>
+              </div>
+            </div>
+            
+            <div class="comprovante-footer" style="
+              margin-top: 20px;
+              padding-top: 12px;
+              border-top: 1px solid #e9ecef;
+            ">
+              <div class="footer-divider" style="
+                height: 1px;
+                background: #dee2e6;
+                margin: 12px 0 8px 0;
+              "></div>
+              <p style="text-align: center; color: #6c757d; font-size: 9px; margin: 0;">
+                Comprovante gerado em ${new Date().toLocaleString('pt-BR')} | 
+                Sistema de Acesso Condominial
+              </p>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(tempDiv);
+        
+        // Aguardar um pouco para garantir que as imagens carreguem
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Capturar como canvas
+        const canvas = await html2canvas(tempDiv, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        
+        // Limpar o elemento temporário
+        document.body.removeChild(tempDiv);
+        
+        // Configurações do PDF
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        pdf.setProperties({
+            name: "comprovante.pdf",
+            filename: "comprovante.pdf"
+        });
+        
+        // Calcular dimensões mantendo proporção
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const ratio = imgHeight / imgWidth;
+        const pdfImgHeight = pdfWidth * ratio;
+        
+        // Adicionar imagem ao PDF
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfImgHeight);
+        
+        // Gerar o Blob do PDF
+        const pdfBlob = pdf.output('blob');
+        
+        resolve(pdfBlob);
+        
+      } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        reject(error);
+      }
+    });
+  };
+
+  // 🆕 FUNÇÃO PRINCIPAL PARA SALVAR PDF AUTOMATICAMENTE
+  const salvarPDFAutomaticamente = async () => {
+    // Verificar se já foi salvo recentemente (evitar duplicação)
+    const chaveSalvamento = `pdf_salvo_${data.id}`;
+    const jaSalvo = localStorage.getItem(chaveSalvamento);
+    
+    if (jaSalvo) {
+      console.log('PDF já foi salvo anteriormente para esta autorização');
+      return;
+    }
+
+    setSalvamentoStatus({ 
+      salvando: true, 
+      sucesso: false, 
+      erro: false, 
+      mensagem: 'Salvando comprovante no sistema...' 
+    });
+
+    try {
+      // 1. Gerar PDF como Blob
+      const pdfBlob = await gerarPDFComoBlob();
+      
+      // 2. Nome do arquivo
+      const nomeArquivo = `comprovante-${data.nome.replace(/\s+/g, '_')}-${data.id}.png`;
+      
+      // 3. Upload para o backend
+      await autorizacoesApi.salvarComprovantePDF(data.id, pdfBlob, nomeArquivo);
+      
+      // 4. Marcar como salvo no localStorage (válido por 1 hora)
+      localStorage.setItem(chaveSalvamento, 'true');
+      setTimeout(() => {
+        localStorage.removeItem(chaveSalvamento);
+      }, 60 * 60 * 1000); // 1 hora
+      
+      setSalvamentoStatus({ 
+        salvando: false, 
+        sucesso: true, 
+        erro: false, 
+        mensagem: '✅ Comprovante salvo automaticamente no sistema' 
+      });
+      
+      console.log('PDF salvo com sucesso no backend');
+      
+    } catch (error) {
+      console.error('Erro ao salvar PDF automaticamente:', error);
+      setSalvamentoStatus({ 
+        salvando: false, 
+        sucesso: false, 
+        erro: true, 
+        mensagem: '⚠️ Comprovante salvo localmente, mas não foi possível enviar para o sistema' 
+      });
+    }
+  };
 
   // Função para imprimir apenas o comprovante - QR CODE NA LATERAL
   const handlePrint = () => {
@@ -513,6 +890,24 @@ const QRCodeDisplay = ({ data, onClose }) => {
       <div className="qr-code-modal">
         <div className="qr-code-header">
           <h2>Cadastro Realizado com Sucesso!</h2>
+
+          {/* 🆕 INDICADOR DE SALVAMENTO AUTOMÁTICO */}
+          {salvamentoStatus.salvando && (
+            <div className="salvamento-status salvando">
+              ⏳ {salvamentoStatus.mensagem}
+            </div>
+          )}
+          {salvamentoStatus.sucesso && (
+            <div className="salvamento-status sucesso">
+              ✅ {salvamentoStatus.mensagem}
+            </div>
+          )}
+          {salvamentoStatus.erro && (
+            <div className="salvamento-status erro">
+              ⚠️ {salvamentoStatus.mensagem}
+            </div>
+          )}
+
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         
