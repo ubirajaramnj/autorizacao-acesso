@@ -150,40 +150,4 @@
   background-color: #5a6268;
 }
 
-/* Estilos para o comprovante de impressão */
-.comprovante-impressao {
-  display: none;
-}
-
-/* Responsividade do modal */
-@media (max-width: 768px) {
-  .qr-code-modal {
-    padding: var(--spacing-lg);
-  }
-  
-  .qr-code-content {
-    gap: var(--spacing-lg);
-  }
-  
-  .qr-code-actions {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-  .qr-code-overlay {
-    padding: var(--spacing-md);
-  }
-  
-  .qr-code-modal {
-    padding: var(--spacing-md);
-  }
-  
-  .qr-code-info {
-    padding: var(--spacing-md);
-  }
-  
-  .qr-code-container {
-    padding: var(--spacing-md);
-  }
-}
+/* Adicione estas regras ao seu QRCodeDisplay.css existente */
