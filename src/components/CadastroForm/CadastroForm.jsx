@@ -13,7 +13,8 @@ import {
   parseLocalDate, 
   getTodayLocal, 
   getTodayLocalString,
-  isDateValid 
+  isDateValid,
+  compareDates
 } from '../../utils/dateFormat';
 import QRCodeDisplay from "../QRCodeDisplay/QRCodeDisplay";
 import ConfirmacaoAutorizacao from "../ConfirmacaoAutorizacao/ConfirmacaoAutorizacao";
