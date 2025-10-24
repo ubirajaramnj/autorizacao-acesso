@@ -7,6 +7,45 @@ import Loader from '../Loader/Loader';
 import "./PortariaLeitorQR.css";
 import { formatDateToDisplay } from '../../utils/dateFormat';
 
+// 🆕 COMPONENTE DE MODAL DE CONFIRMAÇÃO
+const ModalConfirmacao = ({ nome, tipo, onConfirm }) => {
+  return (
+    <div className="modal-overlay">
+      <div className="modal-confirmacao">
+        <div className="modal-header">
+          <div className="modal-icon">✅</div>
+          <h3>Entrada Liberada!</h3>
+        </div>
+        
+        <div className="modal-body">
+          <p>
+            <strong>{nome}</strong> ({tipo === 'Visitante' ? 'Visitante' : 'Prestador de Serviço'})
+          </p>
+          <p>Teve a entrada autorizada e registrada no sistema.</p>
+          <div className="modal-details">
+            <span>📅 {new Date().toLocaleDateString('pt-BR')}</span>
+            <span>⏰ {new Date().toLocaleTimeString('pt-BR', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}</span>
+          </div>
+        </div>
+        
+        <div className="modal-footer">
+          <button 
+            onClick={onConfirm}
+            className="modal-confirm-btn"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
 const PortariaLeitorQR = () => {
   const [scanning, setScanning] = useState(false);
   const [autorizacao, setAutorizacao] = useState(null);
@@ -16,6 +55,10 @@ const PortariaLeitorQR = () => {
   const [entradaRegistrada, setEntradaRegistrada] = useState(false);
   const [manualInput, setManualInput] = useState("");
   const [documentosUploaded, setDocumentosUploaded] = useState([]);
+
+  // 🆕 NOVO ESTADO PARA O MODAL
+  const [showModalConfirmacao, setShowModalConfirmacao] = useState(false);
+
   const qrReaderRef = useRef(null);
 
   // 🆕 FUNÇÃO DEBUG - adicione esta função
@@ -132,16 +175,25 @@ const PortariaLeitorQR = () => {
       };
 
       console.log('📤 Enviando dados de entrada:', checkIn);
-      await autorizacoesApi.registrarEntrada(checkIn);
+      const response = await autorizacoesApi.registrarEntrada(checkIn);
       console.log('✅ Resposta do backend:', response);
 
       setEntradaRegistrada(true);
       setSuccess("✅ Entrada registrada com sucesso!");
+      
+      // 🆕 MOSTRAR MODAL DE CONFIRMAÇÃO
+      setShowModalConfirmacao(true);
     } catch (err) {
       setError("Erro ao registrar entrada");
     } finally {
       setLoading(false);
     }
+  };
+
+  // 🆕 FUNÇÃO PARA CONFIRMAR MODAL E VOLTAR AO INÍCIO
+  const handleConfirmarModal = () => {
+    setShowModalConfirmacao(false);
+    resetarProcesso();
   };
 
   const handleManualSubmit = (e) => {
@@ -158,6 +210,8 @@ const PortariaLeitorQR = () => {
     setEntradaRegistrada(false);
     setManualInput("");
     setScanning(false);
+    setDocumentosUploaded([]);
+    setShowModalConfirmacao(false);
   };
 
   const formatarDocumento = (doc) => {
@@ -171,8 +225,17 @@ const PortariaLeitorQR = () => {
 
   return (
     <div className="portaria-leitor">
+      {/* 🆕 MODAL DE CONFIRMAÇÃO */}
+      {showModalConfirmacao && autorizacao && (
+        <ModalConfirmacao 
+          nome={autorizacao.nome}
+          tipo={autorizacao.tipo}
+          onConfirm={handleConfirmarModal}
+        />
+      )}
+
       {/* 🆕 BOTÃO DEBUG - adicione temporariamente */}
-      {autorizacao && (
+      {/* {autorizacao && (
         <button 
           onClick={debugEstado}
           style={{
@@ -190,9 +253,10 @@ const PortariaLeitorQR = () => {
         >
           🐛 Debug
         </button>
-      )}
+      )} */}
       
       {loading && <Loader logoSize="large" message="Realizando cadastro..." />}
+
       <header className="portaria-header">
         <h1>🏢 Sistema de Portaria</h1>
         <p>Leia o QR Code ou digite o ID manualmente</p>
@@ -248,11 +312,15 @@ const PortariaLeitorQR = () => {
           </>
         )}
 
-        {autorizacao && (
-          <button onClick={resetarProcesso} className="new-scan-btn">
-            🔄 Nova Leitura
-          </button>
+        {/* Botão Nova Leitura - SÓ MOSTRA SE TIVER AUTORIZAÇÃO E NÃO ESTIVER NO MODAL */}
+        {autorizacao && !showModalConfirmacao && (
+          <div className="controles-portaria">
+            <button onClick={resetarProcesso} className="new-scan-btn">
+              🔄 Nova Leitura
+            </button>
+          </div>
         )}
+
       </div>
 
       {/* Mensagens de Status */}
@@ -263,12 +331,17 @@ const PortariaLeitorQR = () => {
         </div>
       )}
 
-      {error && <div className="status-message error">❌ {error}</div>}
+      {/* Mensagens de Status */}
+      {error && !showModalConfirmacao && (
+        <div className="status-message error">❌ {error}</div>
+      )}
 
-      {success && <div className="status-message success">{success}</div>}
+      {success && !showModalConfirmacao && (
+        <div className="status-message success">{success}</div>
+      )}
 
       {/* Dados da Autorização */}
-      {autorizacao && (
+      {autorizacao && !showModalConfirmacao && (
         <div className="autorizacao-details">
           <h2>📋 Dados da Autorização</h2>
 
@@ -387,7 +460,7 @@ const PortariaLeitorQR = () => {
             </div>
           )}
 
-          {entradaRegistrada && (
+          {entradaRegistrada && !showModalConfirmacao && (
             <div className="entrada-registrada">
               <h3>🎉 Entrada Registrada com Sucesso!</h3>
               <p>Hora da entrada: {new Date().toLocaleString("pt-BR")}</p>
