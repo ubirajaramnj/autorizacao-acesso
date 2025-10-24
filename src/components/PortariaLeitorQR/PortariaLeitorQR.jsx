@@ -1,15 +1,17 @@
 // src/components/PortariaLeitorQR/PortariaLeitorQR.jsx
 import React, { useState, useRef, useCallback } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
-import {
-  buscarAutorizacaoPorId,
-  registrarEntrada,
-  uploadDocumento,
-} from "../../services/mockApi";
 import { autorizacoesApi } from "../../services/autorizacoesApi";
 import DocumentUpload from "../DocumentUpload/DocumentUpload";
 import "./PortariaLeitorQR.css";
 import { formatDateToDisplay } from '../../utils/dateFormat';
+import {
+  maskTelefone,
+  maskCNPJ,
+  maskCPF,
+  maskRG,
+  removeMask,
+} from "../../utils/masks";
 
 const PortariaLeitorQR = () => {
   const [scanning, setScanning] = useState(false);

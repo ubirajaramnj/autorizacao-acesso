@@ -91,6 +91,16 @@ export const formatCPF = (cpf) => {
   return cleanCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 };
 
+// 🆕 NOVA FUNÇÃO: Formata CNPJ
+export const formatCNPJ = (cnpj) => {
+  if (!cnpj) return '';
+  const cleanCNPJ = removeMask(cnpj);
+  if (cleanCNPJ.length !== 14) return cnpj;
+  
+  return cleanCNPJ.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+};
+
+
 export const formatRG = (rg) => {
   if (!rg) return '';
   const cleanRG = removeMask(rg);
@@ -104,4 +114,47 @@ export const formatRG = (rg) => {
   } else {
     return cleanRG.replace(/(\d{3})(\d{3})(\d{3})(\d{0,1})/, '$1.$2.$3-$4');
   }
+};
+
+// 🆕 FUNÇÃO UNIVERSAL: Detecta e formata automaticamente
+export const formatDocument = (document) => {
+  if (!document) return '';
+  
+  const cleanDoc = removeMask(document);
+  
+  if (cleanDoc.length === 11) {
+    return formatCPF(document);
+  } else if (cleanDoc.length === 14) {
+    return formatCNPJ(document);
+  }
+  
+  return document;
+};
+
+// 🆕 FUNÇÃO: Valida formato de CNPJ
+export const isValidCNPJ = (cnpj) => {
+  if (!cnpj) return false;
+  const cleanCNPJ = removeMask(cnpj);
+  return cleanCNPJ.length === 14;
+};
+
+// 🆕 FUNÇÃO: Valida formato de CPF
+export const isValidCPF = (cpf) => {
+  if (!cpf) return false;
+  const cleanCPF = removeMask(cpf);
+  return cleanCPF.length === 11;
+};
+
+// Função existente para telefone
+export const formatTelefone = (telefone) => {
+  if (!telefone) return '';
+  const cleanTel = removeMask(telefone);
+  
+  if (cleanTel.length === 11) {
+    return cleanTel.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  } else if (cleanTel.length === 10) {
+    return cleanTel.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  }
+  
+  return telefone;
 };

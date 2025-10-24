@@ -1,6 +1,12 @@
 import React from 'react';
 import QRCode from 'qrcode.react';
-import { applyDocumentMask, removeMask, detectDocumentType, formatRG, formatCPF } from '../../utils/masks';
+import { 
+  applyDocumentMask, 
+  removeMask, 
+  detectDocumentType, 
+  formatRG, 
+  formatCPF, 
+  formatCNPJ } from '../../utils/masks';
 import './QRCodeDisplay.css';
 import { formatDateToDisplay } from '../../utils/dateFormat';
 
@@ -83,7 +89,7 @@ const QRCodeDisplay = ({ data, onClose }) => {
               }
             </p>
             {data.empresa && <p><strong>Empresa:</strong> {data.empresa}</p>}
-            {data.cnpj && <p><strong>CNPJ:</strong> {data.cnpj}</p>}
+            {data.cnpj && <p><strong>CNPJ:</strong> {formatCNPJ(data.cnpj)}</p>}
 
             {/* ✅ ADICIONE ESTAS LINHAS: */}
             {(data.apiLink || data.id) && (
