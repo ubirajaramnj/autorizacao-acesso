@@ -320,7 +320,7 @@ const CadastroForm = () => {
       {loading && <Loader logoSize="large" message="Realizando cadastro..." />}
       {dadosAutorizador.nome && (
         <div className="autorizador-info">
-          <h3>Autorização de: {dadosAutorizador.nome}</h3>
+          <h3>Autorizador: {dadosAutorizador.nome}</h3>
           <p>
             Unidade: {dadosAutorizador.codigoDaUnidade} | Tel:{" "}
             {dadosAutorizador.telefone}

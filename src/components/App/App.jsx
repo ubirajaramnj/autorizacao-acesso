@@ -23,7 +23,7 @@ function App() {
               />
             </div>
           </div>
-          <h1>Sistema de Cadastro</h1>
+          <h1>Autorização de Acesso</h1>
           <Routes>
             <Route path="/" element={<CadastroForm />} />
             {/* 🆕 NOVA ROTA da portaria */}
