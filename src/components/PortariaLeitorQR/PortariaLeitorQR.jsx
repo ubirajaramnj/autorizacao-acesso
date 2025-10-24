@@ -9,6 +9,7 @@ import {
 import { autorizacoesApi } from "../../services/autorizacoesApi";
 import DocumentUpload from "../DocumentUpload/DocumentUpload";
 import "./PortariaLeitorQR.css";
+import { formatDateToDisplay } from '../../utils/dateFormat';
 
 const PortariaLeitorQR = () => {
   const [scanning, setScanning] = useState(false);
@@ -161,10 +162,6 @@ const PortariaLeitorQR = () => {
     setScanning(false);
   };
 
-  const formatarData = (dataString) => {
-    return new Date(dataString).toLocaleDateString("pt-BR");
-  };
-
   const formatarDocumento = (doc) => {
     if (!doc) return "N/A";
     // Aplica formatação básica para CPF/RG
@@ -293,12 +290,11 @@ const PortariaLeitorQR = () => {
               <strong>RG:</strong> {formatarDocumento(autorizacao.rg)}
             </div>
             <div className="dado-item">
-              <strong>Período:</strong>{" "}
-              {autorizacao.periodo === "unico"
-                ? `Dia único: ${formatarData(autorizacao.dataInicio)}`
-                : `De ${formatarData(
-                    autorizacao.dataInicio
-                  )} até ${formatarData(autorizacao.dataFim)}`}
+              <p><strong>Período:</strong> {autorizacao.periodo === 'unico' 
+                  ? `Dia único: ${formatDateToDisplay(autorizacao.dataInicio)}`
+                  : `De ${formatDateToDisplay(autorizacao.dataInicio)} até ${formatDateToDisplay(autorizacao.dataFim)}`
+                }
+              </p>
             </div>
             {autorizacao.empresa && (
               <div className="dado-item">

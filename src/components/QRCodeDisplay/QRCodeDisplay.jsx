@@ -2,6 +2,7 @@ import React from 'react';
 import QRCode from 'qrcode.react';
 import { applyDocumentMask, removeMask, detectDocumentType, formatRG, formatCPF } from '../../utils/masks';
 import './QRCodeDisplay.css';
+import { formatDateToDisplay } from '../../utils/dateFormat';
 
 const QRCodeDisplay = ({ data, onClose }) => {
   if (!data) return null;
@@ -77,9 +78,10 @@ const QRCodeDisplay = ({ data, onClose }) => {
             <p><strong>CPF:</strong> {formatCPF(data.cpf)}</p>
             <p><strong>RG:</strong> {formatRG(data.rg)}</p>
             <p><strong>Período:</strong> {data.periodo === 'unico' 
-              ? `Dia único: ${new Date(data.dataInicio).toLocaleDateString('pt-BR')}`
-              : `De ${new Date(data.dataInicio).toLocaleDateString('pt-BR')} até ${new Date(data.dataFim).toLocaleDateString('pt-BR')}`
-            }</p>
+                ? `Dia único: ${formatDateToDisplay(data.dataInicio)}`
+                : `De ${formatDateToDisplay(data.dataInicio)} até ${formatDateToDisplay(data.dataFim)}`
+              }
+            </p>
             {data.empresa && <p><strong>Empresa:</strong> {data.empresa}</p>}
             {data.cnpj && <p><strong>CNPJ:</strong> {data.cnpj}</p>}
 

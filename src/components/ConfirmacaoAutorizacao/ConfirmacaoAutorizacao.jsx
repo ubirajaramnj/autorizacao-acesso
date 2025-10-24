@@ -1,5 +1,6 @@
 import React from 'react';
 import './ConfirmacaoAutorizacao.css';
+import { formatDateToDisplay } from '../../utils/dateFormat';
 
 const ConfirmacaoAutorizacao = ({ 
   dadosAutorizacao, 
@@ -9,20 +10,8 @@ const ConfirmacaoAutorizacao = ({
 }) => {
   if (!dadosAutorizacao || !dadosVisitante) return null;
 
-  const formatarData = (data) => {
-    return new Date(data).toLocaleDateString('pt-BR');
-  };
-
   const getTipoTexto = (tipo) => {
     return tipo === 'visitante' ? 'visitante' : 'prestador de serviço';
-  };
-
-  const getPeriodoTexto = (periodo, dataInicio, dataFim) => {
-    if (periodo === 'unico') {
-      return `na data ${formatarData(dataInicio)}`;
-    } else {
-      return `no período de ${formatarData(dataInicio)} até ${formatarData(dataFim)}`;
-    }
   };
 
   return (
@@ -39,12 +28,12 @@ const ConfirmacaoAutorizacao = ({
               unidade {dadosAutorizacao.codigoDaUnidade}, autorizo o{" "}
               <strong>{getTipoTexto(dadosVisitante.tipo)}</strong>,{" "}
               <strong>{dadosVisitante.nome}</strong>, CPF {dadosVisitante.cpf}, 
-              RG {dadosVisitante.rg}, a entrar no condomínio{" "}
-              {getPeriodoTexto(
-                dadosVisitante.periodo, 
-                dadosVisitante.dataInicio, 
-                dadosVisitante.dataFim
-              )}.
+              RG {dadosVisitante.rg}, a entrar no condomínio{" "},
+              <p><strong>Período:</strong> {dadosVisitante.periodo === 'unico' 
+                  ? `Dia único: ${formatDateToDisplay(dadosVisitante.dataInicio)}`
+                  : `De ${formatDateToDisplay(dadosVisitante.dataInicio)} até ${formatDateToDisplay(dadosVisitante.dataFim)}`
+                }
+              </p>
             </p>
           </div>
 

@@ -1,42 +1,48 @@
 // src/components/CadastroForm/CadastroForm.js
-import React, { useState, useEffect } from 'react';
-import InputMask from 'react-input-mask';
-import { autorizacoesApi } from '../../services/autorizacoesApi';
-import { 
-  maskTelefone, 
-  maskCNPJ, 
+import React, { useState, useEffect } from "react";
+import InputMask from "react-input-mask";
+import { autorizacoesApi } from "../../services/autorizacoesApi";
+import {
+  maskTelefone,
+  maskCNPJ,
   maskCPF,
   maskRG,
-  removeMask
-} from '../../utils/masks';
-import QRCodeDisplay from '../QRCodeDisplay/QRCodeDisplay';
-import ConfirmacaoAutorizacao from '../ConfirmacaoAutorizacao/ConfirmacaoAutorizacao';
-import './CadastroForm.css';
+  removeMask,
+} from "../../utils/masks";
+import { 
+  parseLocalDate, 
+  getTodayLocal, 
+  getTodayLocalString,
+  isDateValid 
+} from '../../utils/dateFormat';
+import QRCodeDisplay from "../QRCodeDisplay/QRCodeDisplay";
+import ConfirmacaoAutorizacao from "../ConfirmacaoAutorizacao/ConfirmacaoAutorizacao";
+import "./CadastroForm.css";
 
 const CadastroForm = () => {
   const [dadosAutorizador, setDadosAutorizador] = useState({
-    nome: '',
-    telefone: '',
-    codigoDaUnidade: ''
+    nome: "",
+    telefone: "",
+    codigoDaUnidade: "",
   });
-
+  
   const [formData, setFormData] = useState({
-    tipo: 'visitante',
-    nome: '',
-    email: '',
-    telefone: '',
-    cpf: '',
-    rg: '',
-    empresa: '',
-    cnpj: '',
-    periodo: 'unico',
-    dataInicio: '',
-    dataFim: ''
+    tipo: "visitante",
+    nome: "",
+    email: "",
+    telefone: "",
+    cpf: "",
+    rg: "",
+    empresa: "",
+    cnpj: "",
+    periodo: "unico",
+    dataInicio: getTodayLocalString(),
+    dataFim: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [qrCodeData, setQrCodeData] = useState(null);
 
   const [showConfirmacao, setShowConfirmacao] = useState(false);
@@ -44,23 +50,22 @@ const CadastroForm = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const nome = urlParams.get('nome');
-    const telefone = urlParams.get('telefone');
-    const codigoDaUnidade = urlParams.get('codigoDaUnidade');
+    const nome = urlParams.get("nome");
+    const telefone = urlParams.get("telefone");
+    const codigoDaUnidade = urlParams.get("codigoDaUnidade");
 
     if (nome && telefone && codigoDaUnidade) {
-
       const telefoneFormatado = formatarTelefoneAutorizador(telefone);
 
       setDadosAutorizador({
         nome: decodeURIComponent(nome),
         telefone: telefoneFormatado,
-        codigoDaUnidade: decodeURIComponent(codigoDaUnidade)
+        codigoDaUnidade: decodeURIComponent(codigoDaUnidade),
       });
     }
   }, []);
 
-   const coletarInformacoesDispositivo = () => {
+  const coletarInformacoesDispositivo = () => {
     return {
       dataHora: new Date().toISOString(),
       dispositivo: navigator.userAgent,
@@ -68,22 +73,22 @@ const CadastroForm = () => {
       linguagem: navigator.language,
       plataforma: navigator.platform,
       // IP seria coletado via backend na implementação real
-      ip: 'A ser coletado pelo backend'
+      ip: "A ser coletado pelo backend",
     };
   };
 
   // Função para formatar telefone do autorizador
   const formatarTelefoneAutorizador = (telefone) => {
-    if (!telefone) return '';
-    
+    if (!telefone) return "";
+
     // Remove tudo que não é dígito
-    const numeros = telefone.replace(/\D/g, '');
-    
+    const numeros = telefone.replace(/\D/g, "");
+
     // Aplica a máscara baseada no tamanho
     if (numeros.length === 10) {
-      return numeros.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      return numeros.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
     } else if (numeros.length === 11) {
-      return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      return numeros.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     } else {
       // Se não tiver o formato esperado, retorna o original
       return telefone;
@@ -92,30 +97,30 @@ const CadastroForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     let formattedValue = value;
-    
+
     // Aplicar máscaras
-    if (name === 'telefone') {
+    if (name === "telefone") {
       formattedValue = maskTelefone(value);
-    } else if (name === 'cnpj') {
+    } else if (name === "cnpj") {
       formattedValue = maskCNPJ(value);
-    } else if (name === 'cpf') {
+    } else if (name === "cpf") {
       formattedValue = maskCPF(value);
-    } else if (name === 'rg') {
+    } else if (name === "rg") {
       formattedValue = maskRG(value); // Usa a nova máscara flexível
     }
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: formattedValue
+      [name]: formattedValue,
     }));
-    
+
     // Limpar erro do campo quando usuário começar a digitar
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -124,69 +129,73 @@ const CadastroForm = () => {
     const newErrors = {};
 
     // Validações básicas
-    if (!formData.nome.trim()) newErrors.nome = 'Nome é obrigatório';
-    
+    if (!formData.nome.trim()) newErrors.nome = "Nome é obrigatório";
+
     // Email é opcional, mas se preenchido deve ser válido
     if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
+      newErrors.email = "Email inválido";
     }
-    
+
     const cleanTelefone = removeMask(formData.telefone);
     if (!cleanTelefone) {
-      newErrors.telefone = 'Telefone é obrigatório';
+      newErrors.telefone = "Telefone é obrigatório";
     } else if (cleanTelefone.length < 10) {
-      newErrors.telefone = 'Telefone inválido';
+      newErrors.telefone = "Telefone inválido";
     }
-    
+
     // Validações de CPF (obrigatório)
     const cleanCPF = removeMask(formData.cpf);
     if (!cleanCPF) {
-      newErrors.cpf = 'CPF é obrigatório';
+      newErrors.cpf = "CPF é obrigatório";
     } else if (cleanCPF.length !== 11) {
-      newErrors.cpf = 'CPF deve ter 11 dígitos';
+      newErrors.cpf = "CPF deve ter 11 dígitos";
     }
-    
+
     // Validações de RG (obrigatório)
     const cleanRG = removeMask(formData.rg);
     if (!cleanRG) {
-      newErrors.rg = 'RG é obrigatório';
-    } else if (cleanRG.length < 9) {
-      newErrors.rg = 'RG deve ter pelo menos 9 dígitos';
+      newErrors.rg = "RG é obrigatório";
+    } else if (cleanRG.length < 5) {
+      newErrors.rg = "RG deve ter pelo menos 5 dígitos";
     } else if (cleanRG.length > 10) {
-      newErrors.rg = 'RG deve ter no máximo 10 dígitos';
+      newErrors.rg = "RG deve ter no máximo 10 dígitos";
     }
 
     // Validações específicas para prestador de serviço
-    if (formData.tipo === 'prestador' && !formData.empresa.trim()) {
-      newErrors.empresa = 'Nome da empresa é obrigatório para prestadores';
+    if (formData.tipo === "prestador" && !formData.empresa.trim()) {
+      newErrors.empresa = "Nome da empresa é obrigatório para prestadores";
     }
 
     // Validação de CNPJ (se preenchido)
     const cleanCnpj = removeMask(formData.cnpj);
     if (cleanCnpj && cleanCnpj.length !== 14) {
-      newErrors.cnpj = 'CNPJ deve ter 14 dígitos';
+      newErrors.cnpj = "CNPJ deve ter 14 dígitos";
     }
 
-    // Validações de datas
-    const today = new Date();
+    // Validações de datas - COM DEBUG
+    const today = getTodayLocal();
     today.setHours(0, 0, 0, 0);
+
+    console.log('🔍 DEBUG DATAS:');
+    console.log('Hoje (zerado):', today);
+    console.log('Data Início selecionada:', formData.dataInicio);
 
     if (formData.periodo === 'unico') {
       if (!formData.dataInicio) {
         newErrors.dataInicio = 'Data é obrigatória';
-      } else if (new Date(formData.dataInicio) < today) {
+      } else if (!isDateValid(formData.dataInicio)) {
         newErrors.dataInicio = 'Data não pode ser no passado';
       }
     } else {
       if (!formData.dataInicio) {
         newErrors.dataInicio = 'Data de início é obrigatória';
-      } else if (new Date(formData.dataInicio) < today) {
+      } else if (!isDateValid(formData.dataInicio)) {
         newErrors.dataInicio = 'Data de início não pode ser no passado';
       }
       
       if (!formData.dataFim) {
         newErrors.dataFim = 'Data de fim é obrigatória';
-      } else if (formData.dataInicio && new Date(formData.dataFim) < new Date(formData.dataInicio)) {
+      } else if (formData.dataInicio && compareDates(formData.dataFim, formData.dataInicio) < 0) {
         newErrors.dataFim = 'Data de fim deve ser maior que data de início';
       }
     }
@@ -197,7 +206,7 @@ const CadastroForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
+    setMessage("");
     setQrCodeData(null);
 
     if (!validateForm()) {
@@ -205,8 +214,14 @@ const CadastroForm = () => {
     }
 
     // Verifica se temos dados do autorizador
-    if (!dadosAutorizador.nome || !dadosAutorizador.telefone || !dadosAutorizador.codigoDaUnidade) {
-      setMessage('Erro: Dados do autorizador não encontrados. Acesse via link correto.');
+    if (
+      !dadosAutorizador.nome ||
+      !dadosAutorizador.telefone ||
+      !dadosAutorizador.codigoDaUnidade
+    ) {
+      setMessage(
+        "Erro: Dados do autorizador não encontrados. Acesse via link correto."
+      );
       return;
     }
 
@@ -214,12 +229,13 @@ const CadastroForm = () => {
     const dadosParaConfirmacao = {
       dadosAutorizacao: {
         ...dadosAutorizador,
-        ...coletarInformacoesDispositivo()
+        ...coletarInformacoesDispositivo(),
       },
       dadosVisitante: {
         ...formData,
-        dataFim: formData.periodo === 'unico' ? formData.dataInicio : formData.dataFim
-      }
+        dataFim:
+          formData.periodo === "unico" ? formData.dataInicio : formData.dataFim,
+      },
     };
 
     setDadosConfirmacao(dadosParaConfirmacao);
@@ -235,41 +251,40 @@ const CadastroForm = () => {
         ...dadosConfirmacao.dadosVisitante,
         autorizacao: {
           ...dadosConfirmacao.dadosAutorizacao,
-          dataHoraAutorizacao: new Date().toISOString()
+          dataHoraAutorizacao: new Date().toISOString(),
         },
         // Incluir informações do dispositivo
         informacoesDispositivo: coletarInformacoesDispositivo(),
         telefone: removeMask(dadosConfirmacao.dadosVisitante.telefone),
         cpf: removeMask(dadosConfirmacao.dadosVisitante.cpf),
         rg: removeMask(dadosConfirmacao.dadosVisitante.rg),
-        cnpj: removeMask(dadosConfirmacao.dadosVisitante.cnpj)
+        cnpj: removeMask(dadosConfirmacao.dadosVisitante.cnpj),
       };
 
       const response = await autorizacoesApi.criarAutorizacao(dadosCompletos);
-      console.log('Reposta do Cadastro:', response);
-      
+      console.log("Reposta do Cadastro:", response);
+
       setQrCodeData(response.data);
-      setMessage('Cadastro realizado com sucesso!');
+      setMessage("Cadastro realizado com sucesso!");
       setShowConfirmacao(false);
-      
+
       // Limpar formulário após sucesso
       setFormData({
-        tipo: 'visitante',
-        nome: '',
-        email: '',
-        telefone: '',
-        cpf: '',
-        rg: '',
-        empresa: '',
-        cnpj: '',
-        periodo: 'unico',
-        dataInicio: '',
-        dataFim: ''
+        tipo: "visitante",
+        nome: "",
+        email: "",
+        telefone: "",
+        cpf: "",
+        rg: "",
+        empresa: "",
+        cnpj: "",
+        periodo: "unico",
+        dataInicio: "",
+        dataFim: "",
       });
-      
     } catch (error) {
-      setMessage('Erro ao realizar cadastro. Tente novamente.');
-      console.error('Erro no cadastro:', error);
+      setMessage("Erro ao realizar cadastro. Tente novamente.");
+      console.error("Erro no cadastro:", error);
     } finally {
       setIsSubmitting(false);
       setShowConfirmacao(false);
@@ -290,7 +305,10 @@ const CadastroForm = () => {
       {dadosAutorizador.nome && (
         <div className="autorizador-info">
           <h3>Autorização de: {dadosAutorizador.nome}</h3>
-          <p>Unidade: {dadosAutorizador.codigoDaUnidade} | Tel: {dadosAutorizador.telefone}</p>
+          <p>
+            Unidade: {dadosAutorizador.codigoDaUnidade} | Tel:{" "}
+            {dadosAutorizador.telefone}
+          </p>
         </div>
       )}
 
@@ -304,7 +322,7 @@ const CadastroForm = () => {
                 type="radio"
                 name="tipo"
                 value="visitante"
-                checked={formData.tipo === 'visitante'}
+                checked={formData.tipo === "visitante"}
                 onChange={handleChange}
               />
               Visitante
@@ -314,7 +332,7 @@ const CadastroForm = () => {
                 type="radio"
                 name="tipo"
                 value="prestador"
-                checked={formData.tipo === 'prestador'}
+                checked={formData.tipo === "prestador"}
                 onChange={handleChange}
               />
               Prestador de Serviço
@@ -331,7 +349,7 @@ const CadastroForm = () => {
             name="nome"
             value={formData.nome}
             onChange={handleChange}
-            className={errors.nome ? 'error' : ''}
+            className={errors.nome ? "error" : ""}
             placeholder="Digite seu nome completo"
           />
           {errors.nome && <span className="error-message">{errors.nome}</span>}
@@ -345,10 +363,12 @@ const CadastroForm = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={errors.email ? 'error' : ''}
+            className={errors.email ? "error" : ""}
             placeholder="seu@email.com"
           />
-          {errors.email && <span className="error-message">{errors.email}</span>}
+          {errors.email && (
+            <span className="error-message">{errors.email}</span>
+          )}
         </div>
 
         <div className="form-group">
@@ -364,25 +384,27 @@ const CadastroForm = () => {
                 type="tel"
                 id="telefone"
                 name="telefone"
-                className={errors.telefone ? 'error' : ''}
+                className={errors.telefone ? "error" : ""}
                 placeholder="(11) 99999-9999"
               />
             )}
           </InputMask>
-          {errors.telefone && <span className="error-message">{errors.telefone}</span>}
+          {errors.telefone && (
+            <span className="error-message">{errors.telefone}</span>
+          )}
         </div>
 
         {/* Documentos - CPF e RG */}
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="cpf">CPF * Atualizado</label>
+            <label htmlFor="cpf">CPF *</label>
             <InputMask
               mask="999.999.999-99"
               value={formData.cpf}
               onChange={handleChange}
               onBeforeMask={(value) => {
                 // Permite que a máscara funcione mesmo com inputMode numeric
-                return value.replace(/\D/g, '');
+                return value.replace(/\D/g, "");
               }}
             >
               {(inputProps) => (
@@ -393,7 +415,7 @@ const CadastroForm = () => {
                   //pattern="[0-9]*"
                   id="cpf"
                   name="cpf"
-                  className={errors.cpf ? 'error' : ''}
+                  className={errors.cpf ? "error" : ""}
                   placeholder="000.000.000-00"
                 />
               )}
@@ -411,17 +433,19 @@ const CadastroForm = () => {
               name="rg"
               value={formData.rg}
               onChange={handleChange}
-              className={errors.rg ? 'error' : ''}
+              className={errors.rg ? "error" : ""}
               placeholder="000.000.000-0"
               maxLength={13} // Permite até 000.000.000-0 (13 caracteres)
             />
             {errors.rg && <span className="error-message">{errors.rg}</span>}
-            <small className="field-hint">Formato: 000.000.000-0 (9 até 10 dígitos)</small>
+            <small className="field-hint">
+              Formato: 000.000.000-0 (5 até 10 dígitos)
+            </small>
           </div>
         </div>
 
         {/* Campos específicos para Prestador */}
-        {formData.tipo === 'prestador' && (
+        {formData.tipo === "prestador" && (
           <>
             <div className="form-group">
               <label htmlFor="empresa">Nome da Empresa *</label>
@@ -431,10 +455,12 @@ const CadastroForm = () => {
                 name="empresa"
                 value={formData.empresa}
                 onChange={handleChange}
-                className={errors.empresa ? 'error' : ''}
+                className={errors.empresa ? "error" : ""}
                 placeholder="Nome da empresa"
               />
-              {errors.empresa && <span className="error-message">{errors.empresa}</span>}
+              {errors.empresa && (
+                <span className="error-message">{errors.empresa}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -451,12 +477,14 @@ const CadastroForm = () => {
                     inputMode="numeric"
                     id="cnpj"
                     name="cnpj"
-                    className={errors.cnpj ? 'error' : ''}
+                    className={errors.cnpj ? "error" : ""}
                     placeholder="00.000.000/0000-00"
                   />
                 )}
               </InputMask>
-              {errors.cnpj && <span className="error-message">{errors.cnpj}</span>}
+              {errors.cnpj && (
+                <span className="error-message">{errors.cnpj}</span>
+              )}
             </div>
           </>
         )}
@@ -470,7 +498,7 @@ const CadastroForm = () => {
                 type="radio"
                 name="periodo"
                 value="unico"
-                checked={formData.periodo === 'unico'}
+                checked={formData.periodo === "unico"}
                 onChange={handleChange}
               />
               Dia Único
@@ -480,7 +508,7 @@ const CadastroForm = () => {
                 type="radio"
                 name="periodo"
                 value="intervalo"
-                checked={formData.periodo === 'intervalo'}
+                checked={formData.periodo === "intervalo"}
                 onChange={handleChange}
               />
               Período
@@ -492,7 +520,7 @@ const CadastroForm = () => {
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="dataInicio">
-              {formData.periodo === 'unico' ? 'Data *' : 'Data Início *'}
+              {formData.periodo === "unico" ? "Data *" : "Data Início *"}
             </label>
             <input
               type="date"
@@ -500,13 +528,21 @@ const CadastroForm = () => {
               name="dataInicio"
               value={formData.dataInicio}
               onChange={handleChange}
-              className={errors.dataInicio ? 'error' : ''}
-              min={new Date().toISOString().split('T')[0]}
+              className={errors.dataInicio ? "error" : ""}
+              min={getTodayLocalString()} /* 🆕 CORREÇÃO AQUI */
+              // 🆕 Debug temporário
+              onFocus={() => {
+                console.log('Data mínima permitida:', getTodayLocalString());
+                console.log('Data selecionada:', formData.dataInicio);
+                console.log('Data UTC:', new Date().toISOString().split('T')[0]);
+              }}
             />
-            {errors.dataInicio && <span className="error-message">{errors.dataInicio}</span>}
+            {errors.dataInicio && (
+              <span className="error-message">{errors.dataInicio}</span>
+            )}
           </div>
 
-          {formData.periodo === 'intervalo' && (
+          {formData.periodo === "intervalo" && (
             <div className="form-group">
               <label htmlFor="dataFim">Data Fim *</label>
               <input
@@ -515,28 +551,30 @@ const CadastroForm = () => {
                 name="dataFim"
                 value={formData.dataFim}
                 onChange={handleChange}
-                className={errors.dataFim ? 'error' : ''}
-                min={formData.dataInicio || new Date().toISOString().split('T')[0]}
+                className={errors.dataFim ? "error" : ""}
+                min={formData.dataInicio || getTodayLocalString()} /* 🆕 CORREÇÃO AQUI */
               />
-              {errors.dataFim && <span className="error-message">{errors.dataFim}</span>}
+              {errors.dataFim && (
+                <span className="error-message">{errors.dataFim}</span>
+              )}
             </div>
           )}
         </div>
 
         {/* Mensagem de feedback */}
         {message && !qrCodeData && (
-          <div className={`message ${message.includes('Erro') ? 'error' : 'success'}`}>
+          <div
+            className={`message ${
+              message.includes("Erro") ? "error" : "success"
+            }`}
+          >
             {message}
           </div>
         )}
 
         {/* Botão de submit */}
-        <button 
-          type="submit" 
-          className="submit-btn"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
+        <button type="submit" className="submit-btn" disabled={isSubmitting}>
+          {isSubmitting ? "Cadastrando..." : "Cadastrar"}
         </button>
       </form>
 
@@ -550,12 +588,7 @@ const CadastroForm = () => {
       )}
 
       {/* Modal do QR Code */}
-      {qrCodeData && (
-        <QRCodeDisplay 
-          data={qrCodeData} 
-          onClose={closeQRCode}
-        />
-      )}
+      {qrCodeData && <QRCodeDisplay data={qrCodeData} onClose={closeQRCode} />}
     </div>
   );
 };
