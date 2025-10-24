@@ -7,6 +7,7 @@ import {
   formatRG, 
   formatCPF, 
   formatCNPJ } from '../../utils/masks';
+import Loader from '../Loader/Loader';
 import './QRCodeDisplay.css';
 import { formatDateToDisplay } from '../../utils/dateFormat';
 import { autorizacoesApi } from "../../services/autorizacoesApi";
@@ -19,7 +20,8 @@ const QRCodeDisplay = ({ data, onClose }) => {
     salvando: false,
     sucesso: false,
     erro: false,
-    mensagem: ''
+    mensagem: '',
+    bloqueado: false // 🆕 NOVO ESTADO PARA BLOQUEAR A TELA
   });
 
   // 🆕 EFFECT PARA SALVAR AUTOMATICAMENTE AO MONTAR O COMPONENTE
@@ -398,7 +400,8 @@ const QRCodeDisplay = ({ data, onClose }) => {
       salvando: true, 
       sucesso: false, 
       erro: false, 
-      mensagem: 'Salvando comprovante no sistema...' 
+      mensagem: 'Salvando comprovante no sistema...',
+      bloqueado: true // 🆕 BLOQUEIA A TELA 
     });
 
     try {
@@ -421,7 +424,8 @@ const QRCodeDisplay = ({ data, onClose }) => {
         salvando: false, 
         sucesso: true, 
         erro: false, 
-        mensagem: '✅ Comprovante salvo automaticamente no sistema' 
+        mensagem: '✅ Comprovante salvo automaticamente no sistema',
+        bloqueado: false // 🆕 DESBLOQUEIA A TELA
       });
       
       console.log('PDF salvo com sucesso no backend');
@@ -432,7 +436,8 @@ const QRCodeDisplay = ({ data, onClose }) => {
         salvando: false, 
         sucesso: false, 
         erro: true, 
-        mensagem: '⚠️ Comprovante salvo localmente, mas não foi possível enviar para o sistema' 
+        mensagem: '⚠️ Comprovante salvo localmente, mas não foi possível enviar para o sistema',
+        bloqueado: false // 🆕 DESBLOQUEIA A TELA MESMO COM ERRO
       });
     }
   };
@@ -887,6 +892,11 @@ const QRCodeDisplay = ({ data, onClose }) => {
 
   return (
     <div className="qr-code-overlay">
+      {/* 🆕 LOADER BLOQUEANTE - SOBREPÕE TODA A TELA */}
+      {salvamentoStatus.bloqueado && (
+        <Loader logoSize="large" message={salvamentoStatus.mensagem} />
+      )}
+
       <div className="qr-code-modal">
         <div className="qr-code-header">
           <h2>Cadastro Realizado com Sucesso!</h2>
