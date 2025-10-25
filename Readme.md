@@ -4,7 +4,7 @@
 
 Sistema web desenvolvido em React para cadastro de visitantes e prestadores de serviço em condomínios ou empresas. O sistema gera um QR Code para validação na portaria e oferece um comprovante de impressão profissional.
 
-**✨ Destaque:** Sistema completo com frontend, sistema de portaria, upload de documentos e integração completa com API real.
+**✨ Destaque:** Sistema completo com frontend, sistema de portaria, upload de documentos, dashboard administrativo e salvamento automático de comprovantes.
 
 ## 🚀 Funcionalidades
 
@@ -15,7 +15,9 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Sistema de Portaria**: Leitor QR Code integrado com registro de entrada
 - **Upload de Documentos**: Upload real de imagens e PDFs para o backend
 - **Registro Completo**: Entrada registrada com documentação anexada
-- **Comprovante de Impressão**: Layout otimizado para impressão
+- **Comprovante Profissional**: PDF otimizado com layout de duas colunas
+- **Salvamento Automático**: Comprovantes salvos automaticamente no backend
+- **Dashboard Administrativo**: Métricas em tempo real e filtros avançados
 - **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
 - **Máscaras Inteligentes**: CPF, CNPJ, telefone e RG formatados automaticamente
@@ -24,10 +26,11 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 1. **Cadastro**: Preenchimento do formulário com dados pessoais
 2. **Validação**: Verificação automática dos campos obrigatórios
 3. **QR Code**: Geração do código com link da API para validação
-4. **Portaria**: Leitura do QR Code e verificação dos dados
-5. **Upload de Documentos**: Captura e envio real de documentos para o backend
-6. **Registro de Entrada**: Check-in com timestamp e documentação
-7. **Comprovante**: Registro completo com todos os dados
+4. **Salvamento Automático**: Comprovante PDF gerado e salvo no backend
+5. **Portaria**: Leitura do QR Code e verificação dos dados
+6. **Upload de Documentos**: Captura e envio real de documentos para o backend
+7. **Registro de Entrada**: Check-in com timestamp e documentação
+8. **Confirmação**: Modal de confirmação com retorno automático
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -42,6 +45,8 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **qrcode.react** ^3.1.0 - Geração de QR Codes
 - **react-input-mask** ^2.0.4 - Máscaras para campos de entrada
 - **@yudiel/react-qr-scanner** - Leitor de QR Code para portaria
+- **jspdf** ^2.5.1 - Geração de PDFs profissionais
+- **html2canvas** ^1.4.1 - Captura de tela para PDF
 - **uuid** - Geração de IDs únicos
 
 ### Desenvolvimento
@@ -70,6 +75,12 @@ form-cadastro/
 │   │   ├── DocumentUpload/
 │   │   │   ├── DocumentUpload.jsx
 │   │   │   └── DocumentUpload.css
+│   │   ├── Dashboard/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Dashboard.css
+│   │   │   ├── MetricsCards.jsx
+│   │   │   ├── AuthorizationsTable.jsx
+│   │   │   └── FiltersPanel.jsx
 │   │   ├── ApiStatus/
 │   │   │   ├── ApiStatus.jsx
 │   │   │   └── ApiStatus.css
@@ -83,9 +94,12 @@ form-cadastro/
 │   │   ├── api.js (serviço híbrido mock/real)
 │   │   ├── realApi.js (integração com API real)
 │   │   ├── autorizacoesApi.js (serviços de autorizações)
+│   │   ├── dashboardApi.js (serviços do dashboard)
+│   │   ├── pdfApi.js (serviços de PDF/comprovantes)
 │   │   └── apiService.js (gerenciador de serviços)
 │   ├── utils/
-│   │   └── masks.js (utilitários de máscaras)
+│   │   ├── masks.js (utilitários de máscaras)
+│   │   └── dateFormat.js (formatação de datas)
 │   ├── styles/
 │   │   ├── globals.css
 │   │   ├── responsive.css
@@ -146,6 +160,7 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - Escolha data única ou período
 - Clique em "Cadastrar"
 - **QR Code gerado** com link da API
+- **Comprovante salvo automaticamente** no backend
 
 ### 2. Sistema de Portaria com Upload de Documentos
 - Acesse: `http://localhost:3000/portaria`
@@ -154,9 +169,17 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - Verifique os dados do visitante
 - **Faça upload de documentos** (obrigatório) - imagens ou PDF
 - Clique em "Registrar Entrada"
-- **Sistema envia documentos** para o backend e registra check-in
+- **Confirmação automática** com modal de sucesso
+- **Retorno automático** para leitura de QR Code
 
-### 3. Validação na Portaria
+### 3. Dashboard Administrativo
+- Acesse: `http://localhost:3000/dashboard`
+- Visualize **métricas em tempo real**
+- Filtre autorizações por status, tipo, período
+- **Tabela interativa** com ordenação e ações rápidas
+- **Atualização automática** configurável
+
+### 4. Validação na Portaria
 - Apresente o QR Code gerado
 - A portaria escaneia o código
 - Sistema consulta API em tempo real
@@ -177,6 +200,39 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - Payload: `FormData` com arquivo + `autorizacaoId`
 - Retorno: URL real do arquivo no servidor + ID do documento
 
+## 📊 Dashboard Administrativo
+
+### 🎯 Funcionalidades do Dashboard
+- **Métricas em Tempo Real**: Total de autorizações, visitantes, prestadores, check-ins
+- **Filtros Avançados**: Status, tipo, período, busca por texto
+- **Tabela Interativa**: Ordenação, status visual, ações rápidas
+- **Atualização Automática**: Configurável (15s, 30s, 1min, 5min, manual)
+- **Design Responsivo**: Funciona em todos os dispositivos
+
+### 🔍 Filtros Disponíveis
+- **Status**: Com check-in, sem check-in, expirado, pendente
+- **Tipo**: Visitante, Prestador de Serviço
+- **Período**: Dia único, intervalo de datas
+- **Busca**: Nome, CPF, empresa
+- **Filtros Rápidos**: Um clique para casos comuns
+
+## 🖨️ Sistema de Comprovantes PDF
+
+### ✨ Características do Comprovante
+- **Layout Profissional**: Duas colunas (dados + QR Code)
+- **Cabeçalho Corporativo**: Logo e "Autorização de Acesso"
+- **Design Otimizado**: Uma única página em todos os dispositivos
+- **Informações Completas**: Todos os dados do cadastro
+- **QR Code Integrado**: Para validação na portaria
+- **Observações**: Instruções importantes destacadas
+
+### 🔄 Salvamento Automático
+- **Geração Imediata**: Ao abrir tela do QR Code
+- **Upload Automático**: Para backend sem intervenção do usuário
+- **Loader Bloqueante**: Interface impedida durante o processo
+- **Prevenção de Duplicatas**: Controle por localStorage
+- **Feedback Visual**: Status do salvamento em tempo real
+
 ## 🔧 Configuração de API
 
 ```env
@@ -192,6 +248,9 @@ VITE_PORT=3000
 # Configurações de Upload
 VITE_MAX_FILE_SIZE=5242880
 VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/jpg,application/pdf
+
+# Nome da aplicação
+VITE_APP_NAME="Sistema de Acesso"
 ```
 
 ### 📡 Endpoints da API Real
@@ -199,6 +258,9 @@ VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/jpg,application/pdf
 - `GET /api/autorizacoes/{id}` - Buscar autorização por ID
 - `POST /api/checkins` - Registrar entrada com documentos
 - `POST /api/documentos/upload` - Upload de documentos
+- `POST /api/comprovantes/upload` - Upload de comprovantes PDF
+- `GET /api/dashboard/metrics` - Métricas do dashboard
+- `GET /api/autorizacoes` - Listar autorizações com filtros
 
 ## 📊 Funcionalidades Detalhadas
 
@@ -217,6 +279,7 @@ VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/jpg,application/pdf
 - **Upload de Documentos**: Upload real para backend com progresso
 - **Validação de Documentos**: Exige pelo menos um documento para registro
 - **Registro de Entrada**: Timestamp automático com documentação
+- **Modal de Confirmação**: Feedback visual com retorno automático
 - **Interface Otimizada**: Design focado em produtividade da portaria
 
 ### 🔒 Sistema de Upload Seguro
@@ -249,6 +312,7 @@ npm run start:port   # Porta customizada: VITE_PORT=4000 npm run start:port
 # Utilitários
 npm run test:api     # Testar conexão com API real
 npm run test:upload  # Testar funcionalidade de upload
+npm run test:pdf     # Testar geração de PDF
 ```
 
 ### Variáveis de Ambiente
@@ -265,6 +329,9 @@ VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/jpg,application/pdf
 # Application
 VITE_PORT=3000
 VITE_APP_NAME="Sistema de Acesso"
+
+# Dashboard
+VITE_DASHBOARD_REFRESH_INTERVAL=30000
 
 # Docker
 APP_PORT=3000
@@ -289,7 +356,19 @@ APP_PORT=3000
 - Verifique as permissões da câmera no navegador
 - Use o modo de busca manual como alternativa
 
+**Problemas com PDF:**
+- Verifique se as bibliotecas jspdf e html2canvas foram instaladas
+- Confirme permissões de armazenamento no navegador
+- Teste em modo de desenvolvimento para debug
+
 ## 🔄 Melhorias Recentes
+
+### 🎯 Versão 5.0.0 - Sistema Completo com Dashboard e PDF
+- ✅ **Dashboard Administrativo** - Métricas em tempo real e filtros avançados
+- ✅ **Comprovante PDF Profissional** - Layout de duas colunas otimizado
+- ✅ **Salvamento Automático** - PDFs salvos automaticamente no backend
+- ✅ **Loader Bloqueante** - Interface impedida durante processamento
+- ✅ **Modal de Confirmação** - Feedback visual na portaria com retorno automático
 
 ### 🎯 Versão 4.0.0 - Upload Real de Documentos
 - ✅ **Upload Real** - Arquivos enviados para backend via FormData
@@ -333,6 +412,11 @@ APP_PORT=3000
       "dataUpload": "2025-10-22T21:24:33.064Z"
     }
   ],
+  "comprovantePdf": {
+    "nomeArquivo": "comprovante-UBIRAJARA_JR-d0a7fd1e-76da-45a7-870f-22c56958dfc1.pdf",
+    "url": "https://api.com/comprovantes/d0a7fd1e-76da-45a7-870f-22c56958dfc1.pdf",
+    "dataGeracao": "2025-10-22T21:24:33.064Z"
+  },
   "dataHoraEntrada": "2025-10-22T21:24:54.089Z",
   "tipoRegistro": "entrada_com_documentacao"
 }
@@ -340,33 +424,42 @@ APP_PORT=3000
 
 ## 👥 Próximas Melhorias
 
-- [ ] **Dashboard Administrativo** - Estatísticas e relatórios
-- [ ] **Visualização de Documentos** - Preview integrado
+- [ ] **Gráficos e Analytics** - Visualizações de dados avançadas
+- [ ] **Exportação de Relatórios** - CSV, Excel, PDF
+- [ ] **Sistema de Notificações** - Email/SMS para moradores
 - [ ] **OCR de Documentos** - Leitura automática de dados
 - [ ] **Assinatura Digital** - Captura de assinatura na portaria
-- [ ] **Relatórios Avançados** - Analytics de acesso e documentos
-- [ ] **Sistema de Backup** - Backup automático de documentos
+- [ ] **App Mobile** - Versão mobile para portaria
+- [ ] **Integração com CFTV** - Sistema de câmeras
+- [ ] **Backup Automático** - Backup de documentos e dados
 
 ## 🛠 Para Desenvolvedores
 
-### Estrutura de Serviços de Upload
+### Estrutura de Serviços
+
 ```javascript
 // Upload real de documentos
 const response = await autorizacoesApi.uploadDocumentoReal(file, autorizacaoId);
 
 // Registro de entrada com documentos
 const checkinResponse = await autorizacoesApi.registrarEntradaComDocumentos(payload);
+
+// Salvar comprovante PDF
+const pdfResponse = await pdfApi.salvarComprovantePDF(autorizacaoId, pdfBlob, nomeArquivo);
+
+// Dashboard metrics
+const metrics = await dashboardApi.getDashboardMetrics();
 ```
 
 ### Extensão da API
 ```javascript
-// Adicione novos endpoints em autorizacoesApi.js
-async uploadDocumentoReal(file, autorizacaoId) {
+// Adicione novos endpoints
+async salvarComprovantePDF(autorizacaoId, pdfBlob, nomeArquivo) {
   const formData = new FormData();
-  formData.append('documento', file);
+  formData.append('pdf', pdfBlob, nomeArquivo);
   formData.append('autorizacaoId', autorizacaoId);
   
-  const response = await apiClient.post('/documentos/upload', formData, {
+  const response = await apiClient.post('/comprovantes/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
   
@@ -374,10 +467,25 @@ async uploadDocumentoReal(file, autorizacaoId) {
 }
 ```
 
+### Estrutura do Comprovante PDF
+```javascript
+// Geração de PDF com layout profissional
+const pdf = new jsPDF('p', 'mm', 'a4');
+// Layout de duas colunas: dados + QR Code
+// Cabeçalho corporativo com logo
+// Informações completas do cadastro
+// QR Code para validação na portaria
+// Observações importantes destacadas
+```
+
 ---
 
 **Desenvolvido com ❤️ para simplificar o cadastro e controle de acesso em condomínios e empresas.**
 
-**🎉 Sistema 100% funcional com upload real de documentos e integração completa com API!**
+**🎉 Sistema 100% funcional com upload real de documentos, dashboard administrativo e salvamento automático de comprovantes!**
 
 **📁 Documentos seguros e acessíveis via URLs reais do servidor**
+
+**📊 Dashboard completo para gestão e monitoramento em tempo real**
+
+**🖨️ Comprovantes profissionais com salvamento automático no backend**
