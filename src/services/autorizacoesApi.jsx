@@ -2,9 +2,10 @@
 import axios from 'axios';
 
 // Configuração base da API
-const API_BASE_URL = 'https://condominio-api-dev.konsilo.online/api';
+//const API_BASE_URL = 'https://condominio-api-dev.konsilo.online/api';
+const API_BASE_URL = 'https://condominio-api-itac.konsilo.online/api';
 //const API_BASE_URL = 'http://localhost:8090/api';
-const API_TIMEOUT = 10000; // 10 segundos
+const API_TIMEOUT = 1000000; // 10 segundos
 const botWebHook = 'https://typebot.co/api/v1/typebots/mgiw0hpmwe847sq11o9ftfeq/blocks/fb23gcqskexrh0irjhbkt5ke/web/executeTestWebhook'
 
 // Instância do axios com configurações padrão
@@ -49,6 +50,20 @@ apiClient.interceptors.response.use(
 
 // 🆕 Serviços da API Real
 export const autorizacoesApi = {
+  
+  // Buscar autorização por ID
+  async buscarDadosDaAutorizacaoPorCodigoUrl(codUrl) {
+    try {
+      const response = await apiClient.get(`/urls-encurtadas/${codUrl}`);
+      return {
+        data: response.data,
+        status: response.status
+      };
+    } catch (error) {
+      throw this.tratarErroApi(error, 'buscar dados da autorização');
+    }
+  },
+
   // Criar autorização
   async criarAutorizacao(dadosAutorizacao) {
     try {

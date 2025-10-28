@@ -52,19 +52,27 @@ const CadastroForm = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const nome = urlParams.get("nome");
-    const telefone = urlParams.get("telefone");
-    const codigoDaUnidade = urlParams.get("codigoDaUnidade");
+    const codigoUrl = urlParams.get("cod");
+    
+    async function fetchData() {
+        // You can await here
+        const dadosDaAutorizacao = await autorizacoesApi.buscarDadosDaAutorizacaoPorCodigoUrl(codigoUrl);
+        const nome = dadosDaAutorizacao.data.nome;
+        const telefone = dadosDaAutorizacao.data.telefone;
+        const codigoDaUnidade = dadosDaAutorizacao.data.codigoDaUnidade;
 
-    if (nome && telefone && codigoDaUnidade) {
-      const telefoneFormatado = formatarTelefoneAutorizador(telefone);
+        if (nome && telefone && codigoDaUnidade) {
+          const telefoneFormatado = formatarTelefoneAutorizador(telefone);
 
-      setDadosAutorizador({
-        nome: decodeURIComponent(nome),
-        telefone: telefoneFormatado,
-        codigoDaUnidade: decodeURIComponent(codigoDaUnidade),
-      });
+          setDadosAutorizador({
+            nome: decodeURIComponent(nome),
+            telefone: telefoneFormatado,
+            codigoDaUnidade: decodeURIComponent(codigoDaUnidade),
+          });
+        }
     }
+    
+    fetchData();
   }, []);
 
   const coletarInformacoesDispositivo = () => {
