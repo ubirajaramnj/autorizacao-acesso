@@ -6,6 +6,14 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 
 **✨ Destaque:** Sistema completo com frontend, sistema de portaria, upload de documentos, dashboard administrativo e salvamento automático de comprovantes.
 
+## 🚀 Novas Melhorias Implementadas
+
+### 🎯 **Versão 6.0.0 - Sistema Otimizado e Anti-Duplicação**
+- ✅ **Prevenção de Requests Duplicados** - Controle robusto com useRef
+- ✅ **Otimização de Performance** - Fluxo assíncrono otimizado
+- ✅ **Interface Aprimorada** - Layout mais clean e responsivo
+- ✅ **Debug Avançado** - Logs detalhados para desenvolvimento
+
 ## 🚀 Funcionalidades
 
 ### ✨ Principais Características
@@ -21,16 +29,17 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
 - **Máscaras Inteligentes**: CPF, CNPJ, telefone e RG formatados automaticamente
+- **🆕 Sistema Anti-Duplicação**: Prevenção de múltiplos requests simultâneos
 
 ### 🎯 Fluxo do Sistema Completo
 1. **Cadastro**: Preenchimento do formulário com dados pessoais
 2. **Validação**: Verificação automática dos campos obrigatórios
-3. **QR Code**: Geração do código com link da API para validação
-4. **Salvamento Automático**: Comprovante PDF gerado e salvo no backend
-5. **Portaria**: Leitura do QR Code e verificação dos dados
-6. **Upload de Documentos**: Captura e envio real de documentos para o backend
-7. **Registro de Entrada**: Check-in com timestamp e documentação
-8. **Confirmação**: Modal de confirmação com retorno automático
+3. **Confirmação**: Modal de confirmação com dados revisados
+4. **QR Code**: Geração do código com link da API para validação
+5. **Salvamento Automático**: Comprovante PDF gerado e salvo no backend
+6. **Portaria**: Leitura do QR Code e verificação dos dados
+7. **Upload de Documentos**: Captura e envio real de documentos para o backend
+8. **Registro de Entrada**: Check-in com timestamp e documentação
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -81,6 +90,9 @@ form-cadastro/
 │   │   │   ├── MetricsCards.jsx
 │   │   │   ├── AuthorizationsTable.jsx
 │   │   │   └── FiltersPanel.jsx
+│   │   ├── ConfirmacaoAutorizacao/
+│   │   │   ├── ConfirmacaoAutorizacao.jsx
+│   │   │   └── ConfirmacaoAutorizacao.css
 │   │   ├── ApiStatus/
 │   │   │   ├── ApiStatus.jsx
 │   │   │   └── ApiStatus.css
@@ -99,7 +111,9 @@ form-cadastro/
 │   │   └── apiService.js (gerenciador de serviços)
 │   ├── utils/
 │   │   ├── masks.js (utilitários de máscaras)
-│   │   └── dateFormat.js (formatação de datas)
+│   │   ├── dateFormat.js (formatação de datas)
+│   │   ├── comprovanteTemplate.js (template de PDF)
+│   │   └── requestBlocker.js (controle de requests)
 │   ├── styles/
 │   │   ├── globals.css
 │   │   ├── responsive.css
@@ -159,6 +173,7 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - Para prestadores: adicione empresa e CNPJ
 - Escolha data única ou período
 - Clique em "Cadastrar"
+- **Confirme os dados** no modal de confirmação
 - **QR Code gerado** com link da API
 - **Comprovante salvo automaticamente** no backend
 
@@ -185,6 +200,37 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - Sistema consulta API em tempo real
 - Documentos são enviados e armazenados no servidor
 - Acesso liberado conforme período autorizado
+
+## 🔧 Sistema Anti-Duplicação
+
+### 🎯 Controle de Requests Únicos
+- **Prevenção de Fetch Duplicado**: `hasFetchedRef` controla execução única do useEffect
+- **Bloqueio de Confirmação Dupla**: `isSubmittingRef` impede múltiplas submissões
+- **Salvamento Único de PDF**: `hasSavedRef` + `isSavingRef` garantem salvamento único
+- **Debounce Automático**: 2 segundos entre submissões
+
+### 🔧 Implementação
+```javascript
+// Controle de fetch único
+const hasFetchedRef = useRef(false);
+useEffect(() => {
+  if (hasFetchedRef.current) return;
+  hasFetchedRef.current = true;
+  // ... fetch data
+}, []);
+
+// Controle de submissão única
+const isSubmittingRef = useRef(false);
+const handleSubmit = async () => {
+  if (isSubmittingRef.current) return;
+  isSubmittingRef.current = true;
+  try {
+    // ... submit logic
+  } finally {
+    isSubmittingRef.current = false;
+  }
+};
+```
 
 ## 🔄 Sistema de Upload de Documentos
 
@@ -230,7 +276,7 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - **Geração Imediata**: Ao abrir tela do QR Code
 - **Upload Automático**: Para backend sem intervenção do usuário
 - **Loader Bloqueante**: Interface impedida durante o processo
-- **Prevenção de Duplicatas**: Controle por localStorage
+- **Prevenção de Duplicatas**: Controle por localStorage + useRef
 - **Feedback Visual**: Status do salvamento em tempo real
 
 ## 🔧 Configuração de API
@@ -361,7 +407,13 @@ APP_PORT=3000
 - Confirme permissões de armazenamento no navegador
 - Teste em modo de desenvolvimento para debug
 
-## 🔄 Melhorias Recentes
+## 🔄 Histórico de Melhorias
+
+### 🎯 **Versão 6.0.0 - Sistema Otimizado e Anti-Duplicação**
+- ✅ **Sistema Anti-Duplicação** - Controle robusto com useRef para prevenir requests duplicados
+- ✅ **Otimização de Performance** - Fluxo assíncrono otimizado e debounce automático
+- ✅ **Interface Aprimorada** - Layout mais clean e responsivo
+- ✅ **Debug Avançado** - Logs detalhados para desenvolvimento
 
 ### 🎯 Versão 5.0.0 - Sistema Completo com Dashboard e PDF
 - ✅ **Dashboard Administrativo** - Métricas em tempo real e filtros avançados
@@ -451,19 +503,17 @@ const pdfResponse = await pdfApi.salvarComprovantePDF(autorizacaoId, pdfBlob, no
 const metrics = await dashboardApi.getDashboardMetrics();
 ```
 
-### Extensão da API
+### Sistema Anti-Duplicação
 ```javascript
-// Adicione novos endpoints
-async salvarComprovantePDF(autorizacaoId, pdfBlob, nomeArquivo) {
-  const formData = new FormData();
-  formData.append('pdf', pdfBlob, nomeArquivo);
-  formData.append('autorizacaoId', autorizacaoId);
-  
-  const response = await apiClient.post('/comprovantes/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  });
-  
-  return response.data;
+// Controle de requests únicos
+const hasFetchedRef = useRef(false);
+const isSubmittingRef = useRef(false);
+const hasSavedRef = useRef(false);
+
+// Prevenção de duplicação em operações críticas
+if (isSubmittingRef.current) {
+  console.log('Operação já em andamento, ignorando...');
+  return;
 }
 ```
 
@@ -484,8 +534,12 @@ const pdf = new jsPDF('p', 'mm', 'a4');
 
 **🎉 Sistema 100% funcional com upload real de documentos, dashboard administrativo e salvamento automático de comprovantes!**
 
+**🛡️ Sistema Anti-Duplicação implementado para garantir performance e consistência**
+
 **📁 Documentos seguros e acessíveis via URLs reais do servidor**
 
 **📊 Dashboard completo para gestão e monitoramento em tempo real**
 
 **🖨️ Comprovantes profissionais com salvamento automático no backend**
+
+**🚀 Versão 6.0.0 - Sistema otimizado e robusto para produção**
