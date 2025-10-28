@@ -25,9 +25,13 @@ const QRCodeDisplay = ({ data, onClose }) => {
     bloqueado: false // 🆕 NOVO ESTADO PARA BLOQUEAR A TELA
   });
 
+  // 🆕 REFS PARA CONTROLAR SALVAMENTO
+  const hasSavedRef = useRef(false);
+  const isSavingRef = useRef(false);
+
   // 🆕 EFFECT PARA SALVAR AUTOMATICAMENTE AO MONTAR O COMPONENTE
   useEffect(() => {
-    if (data && data.id) {
+    if (data && data.id && !hasSavedRef.current && !isSavingRef.current) {
       salvarPDFAutomaticamente();
     }
   }, [data]);
@@ -149,10 +153,14 @@ const QRCodeDisplay = ({ data, onClose }) => {
     const chaveSalvamento = `pdf_salvo_${data.id}`;
     const jaSalvo = localStorage.getItem(chaveSalvamento);
     
-    if (jaSalvo) {
-      console.log('PDF já foi salvo anteriormente para esta autorização');
+    // 🆕 VERIFICAÇÕES ADICIONAIS
+    if (jaSalvo || hasSavedRef.current || isSavingRef.current) {
+      console.log('📝 PDF já foi salvo anteriormente para esta autorização');
       return;
     }
+
+    // 🆕 MARCAR COMO SALVANDO
+    isSavingRef.current = true;
 
     setSalvamentoStatus({ 
       salvando: true, 
@@ -163,6 +171,8 @@ const QRCodeDisplay = ({ data, onClose }) => {
     });
 
     try {
+      console.log("🔄 Iniciando geração e salvamento do PDF...");
+
       // 1. Gerar PDF como Blob
       const pdfBlob = await gerarPDFComoBlob();
       
@@ -170,10 +180,13 @@ const QRCodeDisplay = ({ data, onClose }) => {
       const nomeArquivo = `comprovante-${data.nome.replace(/\s+/g, '_')}-${data.id}.png`;
       
       // 3. Upload para o backend
+      console.log("📤 Enviando PDF para o servidor...");
       await autorizacoesApi.salvarComprovantePDF(data.id, pdfBlob, nomeArquivo);
       
       // 4. Marcar como salvo no localStorage (válido por 1 hora)
       localStorage.setItem(chaveSalvamento, 'true');
+      hasSavedRef.current = true;
+
       setTimeout(() => {
         localStorage.removeItem(chaveSalvamento);
       }, 60 * 60 * 1000); // 1 hora
@@ -197,6 +210,9 @@ const QRCodeDisplay = ({ data, onClose }) => {
         mensagem: '⚠️ Comprovante salvo localmente, mas não foi possível enviar para o sistema',
         bloqueado: false // 🆕 DESBLOQUEIA A TELA MESMO COM ERRO
       });
+    } finally {
+      // 🆕 SEMPRE LIBERAR O ESTADO DE SALVAMENTO
+      isSavingRef.current = false;
     }
   };
 

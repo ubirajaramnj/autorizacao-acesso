@@ -28,12 +28,14 @@ const ConfirmacaoAutorizacao = ({
               unidade {dadosAutorizacao.codigoDaUnidade}, autorizo o{" "}
               <strong>{getTipoTexto(dadosVisitante.tipo)}</strong>,{" "}
               <strong>{dadosVisitante.nome}</strong>, CPF {dadosVisitante.cpf}, 
-              RG {dadosVisitante.rg}, a entrar no condomínio{" "},
-              <p><strong>Período:</strong> {dadosVisitante.periodo === 'unico' 
-                  ? `Dia único: ${formatDateToDisplay(dadosVisitante.dataInicio)}`
-                  : `De ${formatDateToDisplay(dadosVisitante.dataInicio)} até ${formatDateToDisplay(dadosVisitante.dataFim)}`
-                }
-              </p>
+              RG {dadosVisitante.rg}, a entrar no condomínio.
+            </p>
+            {/* 🆕 CORREÇÃO: Parágrafo separado */}
+            <p>
+              <strong>Período:</strong> {dadosVisitante.periodo === 'unico' 
+                ? `Dia único: ${formatDateToDisplay(dadosVisitante.dataInicio)}`
+                : `De ${formatDateToDisplay(dadosVisitante.dataInicio)} até ${formatDateToDisplay(dadosVisitante.dataFim)}`
+              }
             </p>
           </div>
 

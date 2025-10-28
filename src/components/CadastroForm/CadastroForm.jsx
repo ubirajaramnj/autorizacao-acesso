@@ -1,5 +1,5 @@
 // src/components/CadastroForm/CadastroForm.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InputMask from "react-input-mask";
 import { autorizacoesApi } from "../../services/autorizacoesApi";
 import {
@@ -50,11 +50,22 @@ const CadastroForm = () => {
   const [showConfirmacao, setShowConfirmacao] = useState(false);
   const [dadosConfirmacao, setDadosConfirmacao] = useState(null);
 
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const codigoUrl = urlParams.get("cod");
+
+    // 🆕 VERIFICAR SE JÁ FEZ O FETCH
+    if (!codigoUrl || hasFetchedRef.current) {
+      return;
+    }
+
+    // 🆕 MARCAR QUE JÁ FEZ O FETCH
+    hasFetchedRef.current = true;
     
     async function fetchData() {
+      try {
         // You can await here
         const dadosDaAutorizacao = await autorizacoesApi.buscarDadosDaAutorizacaoPorCodigoUrl(codigoUrl);
         const nome = dadosDaAutorizacao.data.nome;
@@ -70,6 +81,9 @@ const CadastroForm = () => {
             codigoDaUnidade: decodeURIComponent(codigoDaUnidade),
           });
         }
+      } catch (error) {
+        console.error("Erro ao buscar dados do autorizador:", error);
+      }
     }
     
     fetchData();
@@ -253,13 +267,24 @@ const CadastroForm = () => {
     setShowConfirmacao(true);
   };
 
+  // 🆕 REF PARA CONTROLAR SUBMISSÃO
+  const isSubmittingRef = useRef(false);
+
   const handleConfirmarAutorizacao = async () => {
+    // 🆕 VERIFICAR SE JÁ ESTÁ SUBMETENDO
+    if (isSubmittingRef.current) {
+      console.log('⏳ Confirmação já em andamento, ignorando clique duplo...');
+      return;
+    }
+    
+    // 🆕 MARCAR COMO SUBMETENDO
+    isSubmittingRef.current = true;
+
     setLoading(true);
     setIsSubmitting(true);
 
     // 🆕 SIMULAÇÃO: Timeout de 60 segundos para testar o loader
-    console.log('⏱️ Iniciando simulação de 60 segundos...');
-    
+    //console.log('⏱️ Iniciando simulação de 60 segundos...');
     // await new Promise((resolve) => {
     //   setTimeout(() => {
     //     console.log('✅ Simulação concluída após 60 segundos');
@@ -283,8 +308,9 @@ const CadastroForm = () => {
         cnpj: removeMask(dadosConfirmacao.dadosVisitante.cnpj),
       };
 
+      console.log("📤 Enviando requisição única para criar autorização...");
       const response = await autorizacoesApi.criarAutorizacao(dadosCompletos);
-      console.log("Reposta do Cadastro:", response);
+      console.log("✅ Resposta ÚNICA do Cadastro:", response);
 
       setQrCodeData(response.data);
       setMessage("Cadastro realizado com sucesso!");
@@ -301,13 +327,15 @@ const CadastroForm = () => {
         empresa: "",
         cnpj: "",
         periodo: "unico",
-        dataInicio: "",
+        dataInicio: getTodayLocalString(),
         dataFim: "",
       });
     } catch (error) {
       setMessage("Erro ao realizar cadastro. Tente novamente.");
       console.error("Erro no cadastro:", error);
     } finally {
+      // 🆕 SEMPRE LIBERAR O ESTADO DE SUBMISSÃO
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
       setShowConfirmacao(false);
       setLoading(false);
