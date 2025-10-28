@@ -273,10 +273,11 @@ const QRCodeDisplay = ({ data, onClose }) => {
 
       <div className="qr-code-modal">
         <div className="qr-code-header">
-          <h2>Cadastro Realizado com Sucesso!</h2>
-
+          <h2>Autorização Criada com Sucesso!</h2>
+          {/* <button className="close-btn" onClick={onClose}>×</button> */}
+          
           {/* 🆕 INDICADOR DE SALVAMENTO AUTOMÁTICO */}
-          {salvamentoStatus.salvando && (
+          {/* {salvamentoStatus.salvando && (
             <div className="salvamento-status salvando">
               ⏳ {salvamentoStatus.mensagem}
             </div>
@@ -290,21 +291,25 @@ const QRCodeDisplay = ({ data, onClose }) => {
             <div className="salvamento-status erro">
               ⚠️ {salvamentoStatus.mensagem}
             </div>
-          )}
+          )} */}
 
-          <button className="close-btn" onClick={onClose}>×</button>
+          
         </div>
         
         <div className="qr-code-content">
           <div className="qr-code-info">
-            <h3>Dados do Cadastro:</h3>
+            <h4>{data.tipo === 'Visitante' ? 'Visitante' : 'Prestador de Serviço'}</h4>
             <p><strong>Nome:</strong> {data.nome}</p>
-            <p><strong>Tipo:</strong> {data.tipo === 'Visitante' ? 'Visitante' : 'Prestador de Serviço'}</p>
-            <p><strong>CPF:</strong> {formatCPF(data.cpf)}</p>
-            <p><strong>RG:</strong> {formatRG(data.rg)}</p>
+            
+            {/* 🆕 CPF e RG na mesma linha */}
+            <div className="documentos-line">
+              <p><strong>CPF:</strong> {formatCPF(data.cpf)}</p>
+              <p><strong>RG:</strong> {formatRG(data.rg)}</p>
+            </div>
+            
             <p><strong>Período:</strong> {data.periodo === 'unico' 
-                ? `Dia único: ${formatDateToDisplay(data.dataInicio)}`
-                : `De ${formatDateToDisplay(data.dataInicio)} até ${formatDateToDisplay(data.dataFim)}`
+                ? `${formatDateToDisplay(data.dataInicio)}`
+                : `${formatDateToDisplay(data.dataInicio)} até ${formatDateToDisplay(data.dataFim)}`
               }
             </p>
             {data.empresa && <p><strong>Empresa:</strong> {data.empresa}</p>}
@@ -313,7 +318,7 @@ const QRCodeDisplay = ({ data, onClose }) => {
             {/* ✅ ADICIONE ESTAS LINHAS: */}
             {(data.apiLink || data.id) && (
               <div className="api-link-info">
-                <p><strong>ID da Autorização:</strong> {data.id}</p>
+                {/* <p><strong>ID da Autorização:</strong> {data.id}</p> */}
                 {/* {data.link && (
                   <p><strong>Link da API:</strong> <code>{data.link}</code></p>
                 )} */}
