@@ -6,6 +6,8 @@
 
 .dashboard-content {
   padding: 20px 30px;
+  height: auto;
+  min-height: auto;
 }
 
 /* Header do Dashboard */

@@ -8,7 +8,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  min-height: 530px;
+  height: auto;
   display: flex;
   flex-direction: column;
 }
@@ -18,7 +18,7 @@
   transform: translateY(-2px);
 }
 
-/* Cores por tipo - CORRIGIDAS */
+/* 🆕 CORREÇÃO: Estilos base por tipo */
 .kanban-card.visitante {
   background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 30%);
   border-left: 4px solid #27ae60;
@@ -29,6 +29,7 @@
   border-left: 4px solid #7f8c8d;
 }
 
+/* 🆕 CORREÇÃO CRÍTICA: Estilos para expirados devem SOBRESCREVER os de tipo */
 .kanban-card.expirado {
   background: linear-gradient(135deg, #fde8e8 0%, #ffffff 30%);
   border-left: 4px solid #e74c3c;
@@ -42,6 +43,7 @@
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 2px solid #f1f2f6;
+  flex-shrink: 0;
 }
 
 .status-icon {
@@ -58,12 +60,21 @@
   border: 1px solid #dee2e6;
 }
 
+/* 🆕 CORREÇÃO: Para cards expirados, ajustar a cor do tipo
+.kanban-card.expirado .card-tipo {
+  background: #fde8e8;
+  color: #e74c3c;
+  border-color: #f5b7b1;
+}
+*/
+
 .card-content {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
   font-size: 13px;
+  flex: 0 1 auto;
+  min-height: 0;
 }
 
 .info-section {
@@ -71,6 +82,13 @@
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #f1f2f6;
+  flex-shrink: 0;
+}
+
+/* 🆕 CORREÇÃO: Para cards expirados, suavizar as seções */
+.kanban-card.expirado .info-section {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: #f5b7b1;
 }
 
 .section-title {
@@ -80,6 +98,11 @@
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* 🆕 CORREÇÃO: Para cards expirados, título mais suave */
+.kanban-card.expirado .section-title {
+  color: #6c757d;
 }
 
 .info-grid {
@@ -93,6 +116,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
+  min-height: auto;
 }
 
 .info-item.full-width {
@@ -108,12 +132,18 @@
   flex-shrink: 0;
 }
 
+/* 🆕 CORREÇÃO: Para cards expirados, labels mais suaves */
+.kanban-card.expirado .info-label {
+  color: #6c757d;
+}
+
 .info-value {
   color: #6c757d;
   font-size: 12px;
   text-align: right;
   flex: 1;
   word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .info-value.status {
@@ -123,6 +153,13 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
+  flex: none;
+}
+
+/* 🆕 CORREÇÃO: Status para expirados */
+.kanban-card.expirado .info-value.status {
+  color: #e74c3c;
+  background: #fde8e8;
 }
 
 .card-actions {
@@ -130,6 +167,12 @@
   padding-top: 12px;
   border-top: 1px solid #f1f2f6;
   text-align: center;
+  flex-shrink: 0;
+}
+
+/* 🆕 CORREÇÃO: Borda superior para expirados */
+.kanban-card.expirado .card-actions {
+  border-top-color: #f5b7b1;
 }
 
 .cancel-btn {
@@ -150,6 +193,17 @@
   transform: translateY(-1px);
 }
 
+/* 🆕 CORREÇÃO: Botão para expirados (mais suave) */
+.kanban-card.expirado .cancel-btn {
+  background: #95a5a6;
+  opacity: 0.7;
+}
+
+.kanban-card.expirado .cancel-btn:hover {
+  background: #7f8c8d;
+  transform: none;
+}
+
 .expirado-badge {
   background: #e74c3c;
   color: white;
@@ -166,7 +220,7 @@
 @media (max-width: 768px) {
   .kanban-card {
     padding: 12px;
-    min-height: 260px;
+    height: auto;
   }
   
   .info-item {
@@ -181,5 +235,30 @@
   
   .info-value {
     text-align: left;
+  }
+  
+  .card-content {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-card {
+    padding: 10px;
+  }
+  
+  .card-content {
+    gap: 8px;
+  }
+  
+  .info-section {
+    padding: 6px;
+  }
+  
+  .expirado-badge {
+    top: 8px;
+    right: 8px;
+    font-size: 9px;
+    padding: 3px 6px;
   }
 }

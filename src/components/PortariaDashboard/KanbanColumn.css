@@ -4,7 +4,8 @@
   border-radius: 8px;
   padding: 15px;
   border-left: 4px solid #3498db;
-  min-height: 500px;
+  height: auto;
+  min-height: auto;
   display: flex;
   flex-direction: column;
 }
@@ -16,6 +17,7 @@
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid #dee2e6;
+  flex-shrink: 0;
 }
 
 .column-title {
@@ -37,19 +39,20 @@
 }
 
 .column-cards {
-  flex: 1;
+  height: auto;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;
-  max-height: 600px;
-  padding-right: 5px;
+  flex: 1 1 auto;
+  overflow: visible;
 }
 
 .empty-column {
   text-align: center;
   padding: 40px 20px;
   color: #7f8c8d;
+  height: auto;
 }
 
 .empty-icon {
@@ -58,7 +61,18 @@
   opacity: 0.5;
 }
 
-/* Scrollbar personalizada */
+/* 🆕 ESTILOS PARA COLUNAS COM MUITOS CARDS */
+.kanban-column:has(.column-cards > :nth-child(10)) {
+  /* Se tiver mais de 10 cards, a coluna pode crescer livremente */
+  min-height: auto;
+}
+
+.kanban-column:has(.column-cards > :nth-child(20)) {
+  /* Se tiver mais de 20 cards, ainda mais liberdade */
+  height: auto;
+}
+
+/* Scrollbar personalizada
 .column-cards::-webkit-scrollbar {
   width: 6px;
 }
@@ -75,4 +89,4 @@
 
 .column-cards::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
-}
+} */

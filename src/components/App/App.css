@@ -131,6 +131,7 @@
   align-items: stretch;
   justify-content: flex-start;
   padding: 0;
+  overflow: visible;
 }
 
 .container-dashboard {
@@ -141,6 +142,8 @@
   padding: 0;
   box-shadow: none;
   margin: 0;
+  height: auto;
+  min-height: 100vh;
 }
 
 /* Header do Dashboard */
