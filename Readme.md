@@ -75,6 +75,9 @@ form-cadastro/
 │   │   ├── CadastroForm/
 │   │   │   ├── CadastroForm.jsx
 │   │   │   └── CadastroForm.css
+│   │   ├── ComprovantePDF/
+│   │   │   ├── ComprovantePDF.jsx
+│   │   │   └── ComprovantePDF.css
 │   │   ├── QRCodeDisplay/
 │   │   │   ├── QRCodeDisplay.jsx
 │   │   │   └── QRCodeDisplay.css
@@ -84,42 +87,40 @@ form-cadastro/
 │   │   ├── DocumentUpload/
 │   │   │   ├── DocumentUpload.jsx
 │   │   │   └── DocumentUpload.css
-│   │   ├── Dashboard/
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Dashboard.css
-│   │   │   ├── MetricsCards.jsx
-│   │   │   ├── AuthorizationsTable.jsx
-│   │   │   └── FiltersPanel.jsx
+│   │   ├── PortariaDashboard/
+│   │   │   ├── PostariaDashboard.jsx
+│   │   │   ├── PortariaDashboard.css
+│   │   │   ├── StatsCards.jsx
+│   │   │   ├── StatsCards.css
+│   │   │   ├── KanbanBoard.jsx
+│   │   │   ├── KanbanBoard.css
+│   │   │   ├── KanbanCard.jsx
+│   │   │   ├── KanbanCard.css
+│   │   │   └── KanbanColumn.jsx
+│   │   │   └── KanbanColumn.css
 │   │   ├── ConfirmacaoAutorizacao/
 │   │   │   ├── ConfirmacaoAutorizacao.jsx
 │   │   │   └── ConfirmacaoAutorizacao.css
-│   │   ├── ApiStatus/
-│   │   │   ├── ApiStatus.jsx
-│   │   │   └── ApiStatus.css
-│   │   └── Navigation/
-│   │       ├── Navigation.jsx
-│   │       └── Navigation.css
+│   │   ├── Loader/
+│   │   │   ├── Loader.jsx
+│   │   │   └── Loader.css
+│   │   └── ValidacaoPortaria/
+│   │       ├── ValidacaoPortaria.jsx
+│   │       └── ValidacaoPortaria.css
 │   ├── pages/
-│   │   ├── CadastroPage.jsx
-│   │   └── PortariaPage.jsx
+│   │   ├── PortariaPage.jsx
+│   │   └── PortariaPage.css
 │   ├── services/
-│   │   ├── api.js (serviço híbrido mock/real)
-│   │   ├── realApi.js (integração com API real)
 │   │   ├── autorizacoesApi.js (serviços de autorizações)
-│   │   ├── dashboardApi.js (serviços do dashboard)
-│   │   ├── pdfApi.js (serviços de PDF/comprovantes)
-│   │   └── apiService.js (gerenciador de serviços)
 │   ├── utils/
 │   │   ├── masks.js (utilitários de máscaras)
 │   │   ├── dateFormat.js (formatação de datas)
 │   │   ├── comprovanteTemplate.js (template de PDF)
-│   │   └── requestBlocker.js (controle de requests)
 │   ├── styles/
 │   │   ├── globals.css
 │   │   ├── responsive.css
 │   │   └── print.css
-│   ├── App.jsx (componente raiz com rotas)
-│   └── main.jsx (ponto de entrada)
+│   └── index.jsx (ponto de entrada)
 ├── public/ (arquivos estáticos)
 ├── scripts/ (scripts de desenvolvimento)
 ├── Dockerfile
@@ -408,6 +409,12 @@ APP_PORT=3000
 - Teste em modo de desenvolvimento para debug
 
 ## 🔄 Histórico de Melhorias
+
+### 🎯 **Versão 7.0.0 - Sistema Otimizado e Anti-Duplicação**
+- ✅ **Dashboard da Portaria** - Dashboard que apresenta as autorizações por Status
+- ✅ **Cancelamento** - Possibilidade do porteiro cancelar uma autorização diretamente no card
+- ✅ **Interface Aprimorada** - Layout mais clean e responsivo
+- ✅ **Debug Avançado** - Logs detalhados para desenvolvimento
 
 ### 🎯 **Versão 6.0.0 - Sistema Otimizado e Anti-Duplicação**
 - ✅ **Sistema Anti-Duplicação** - Controle robusto com useRef para prevenir requests duplicados
