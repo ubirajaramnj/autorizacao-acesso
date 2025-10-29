@@ -170,6 +170,32 @@ export const autorizacoesApi = {
     return response.data;
   },
 
+  // Buscar autorizações para dashboard da portaria
+  async buscarAutorizacoesPortaria() {
+    try {
+      const response = await apiClient.get('/autorizacoes/condominio/SOLARITAC');
+      return {
+        data: response.data,
+        status: response.status
+      };
+    } catch (error) {
+      throw this.tratarErroApi(error, 'buscar autorizações da portaria');
+    }
+  },
+
+  // Cancelar autorização
+  async cancelarAutorizacao(autorizacaoId) {
+    try {
+      const response = await apiClient.patch(`/autorizacoes/${autorizacaoId}/cancelar`);
+      return {
+        data: response.data,
+        status: response.status
+      };
+    } catch (error) {
+      throw this.tratarErroApi(error, 'cancelar autorização');
+    }
+  },
+
   // 🎯 ADAPTAÇÃO DOS PAYLOADS
   adaptarPayloadCriacao(dados) {
     return {

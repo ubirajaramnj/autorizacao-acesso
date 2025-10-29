@@ -145,7 +145,7 @@
 }
 
 .autorizador-info {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: lightsalmon;
   color: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -155,13 +155,14 @@
 
 .autorizador-info h3 {
   margin: 0 0 5px 0;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .autorizador-info p {
   margin: 0;
   opacity: 0.9;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  color:black;
 }
 
 .confirmacao-subtitle {
