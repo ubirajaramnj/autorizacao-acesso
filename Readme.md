@@ -4,9 +4,15 @@
 
 Sistema web desenvolvido em React para cadastro de visitantes e prestadores de serviço em condomínios ou empresas. O sistema gera um QR Code para validação na portaria e oferece um comprovante de impressão profissional.
 
-**✨ Destaque:** Sistema completo com frontend, sistema de portaria, upload de documentos, dashboard administrativo e salvamento automático de comprovantes.
+**✨ Destaque:** Sistema completo com frontend, sistema de portaria, upload de documentos, dashboard administrativo, dashboard da portaria e salvamento automático de comprovantes.
 
 ## 🚀 Novas Melhorias Implementadas
+
+### 🎯 **Versão 7.0.0 - Dashboard da Portaria e Cancelamento**
+- ✅ **Dashboard da Portaria** - Sistema completo de visualização em tempo real com board Kanban
+- ✅ **Cancelamento Direto** - Possibilidade do porteiro cancelar autorizações diretamente nos cards
+- ✅ **Estatísticas em Tempo Real** - Métricas atualizadas automaticamente a cada 30 segundos
+- ✅ **Interface Visual Intuitiva** - Cores e ícones para rápida identificação de status
 
 ### 🎯 **Versão 6.0.0 - Sistema Otimizado e Anti-Duplicação**
 - ✅ **Prevenção de Requests Duplicados** - Controle robusto com useRef
@@ -26,10 +32,12 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Comprovante Profissional**: PDF otimizado com layout de duas colunas
 - **Salvamento Automático**: Comprovantes salvos automaticamente no backend
 - **Dashboard Administrativo**: Métricas em tempo real e filtros avançados
+- **🆕 Dashboard da Portaria**: Controle visual em tempo real com board Kanban
+- **🆕 Cancelamento por Portaria**: Controle granular de autorizações
 - **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
 - **Máscaras Inteligentes**: CPF, CNPJ, telefone e RG formatados automaticamente
-- **🆕 Sistema Anti-Duplicação**: Prevenção de múltiplos requests simultâneos
+- **Sistema Anti-Duplicação**: Prevenção de múltiplos requests simultâneos
 
 ### 🎯 Fluxo do Sistema Completo
 1. **Cadastro**: Preenchimento do formulário com dados pessoais
@@ -40,6 +48,46 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 6. **Portaria**: Leitura do QR Code e verificação dos dados
 7. **Upload de Documentos**: Captura e envio real de documentos para o backend
 8. **Registro de Entrada**: Check-in com timestamp e documentação
+9. **🆕 Monitoramento**: Acompanhamento em tempo real no Dashboard da Portaria
+
+## 🆕 **Sistema de Dashboard da Portaria**
+
+### 🎯 **Controle Visual em Tempo Real**
+O **PortariaDashboard** oferece uma visão completa do fluxo de autorizações através de um board Kanban interativo com 4 status distintos:
+
+#### 📋 **Board Kanban - 4 Colunas de Status**
+- **🟢 AUTORIZADO**: Autorizações liberadas aguardando entrada
+- **🔵 ENTROU**: Acessos registrados na portaria  
+- **🟣 SAIU**: Saídas registradas do condomínio
+- **🔴 EXPIRADO**: Autorizações com prazo vencido
+
+#### 📊 **Cards de Estatísticas Dinâmicas**
+```javascript
+- 📋 Autorizações Hoje: Total de autorizações para o dia atual
+- ✅ Acessos Registrados: Entradas confirmadas na portaria
+- 🚪 Saídas Registradas: Saídas registradas no sistema
+- ⏳ Pendentes de Acesso: Aguardando entrada na portaria
+```
+
+#### 🎨 **Sistema Visual Inteligente**
+- **Cores por tipo**: Verde (visitante), Azul (prestador), Vermelho (expirado)
+- **Ícones de status**: 🟢✅🚪⏰ para rápida identificação
+- **Layout responsivo**: Adaptável a desktop, tablet e mobile
+- **Atualização automática**: Dados sincronizados a cada 30 segundos
+
+#### ⚡ **Funcionalidades de Controle**
+- **Cancelamento direto**: Botão de cancelamento em cards autorizados
+- **Informações completas**: Dados do autorizado, autorizador e empresa
+- **Busca visual**: Filtros por tipo e status através das colunas
+- **Timestamp atualizado**: Última atualização sempre visível
+
+### 🔧 **Ações do Porteiro**
+```javascript
+// Cancelamento disponível apenas para:
+- Status: "Autorizado" 
+- Condição: Não expirado
+- Check-ins: Sem registros de entrada/saída
+```
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -88,7 +136,7 @@ form-cadastro/
 │   │   │   ├── DocumentUpload.jsx
 │   │   │   └── DocumentUpload.css
 │   │   ├── PortariaDashboard/
-│   │   │   ├── PostariaDashboard.jsx
+│   │   │   ├── PortariaDashboard.jsx
 │   │   │   ├── PortariaDashboard.css
 │   │   │   ├── StatsCards.jsx
 │   │   │   ├── StatsCards.css
@@ -96,7 +144,7 @@ form-cadastro/
 │   │   │   ├── KanbanBoard.css
 │   │   │   ├── KanbanCard.jsx
 │   │   │   ├── KanbanCard.css
-│   │   │   └── KanbanColumn.jsx
+│   │   │   ├── KanbanColumn.jsx
 │   │   │   └── KanbanColumn.css
 │   │   ├── ConfirmacaoAutorizacao/
 │   │   │   ├── ConfirmacaoAutorizacao.jsx
@@ -188,14 +236,22 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - **Confirmação automática** com modal de sucesso
 - **Retorno automático** para leitura de QR Code
 
-### 3. Dashboard Administrativo
+### 3. 🆕 Dashboard da Portaria
+- Acesse: `http://localhost:3000/portaria-dashboard`
+- **Visualize estatísticas** em tempo real do dia
+- **Monitore o fluxo** através do board Kanban com 4 colunas
+- **Identifique rapidamente** status por cores e ícones
+- **Cancele autorizações** diretamente nos cards quando necessário
+- **Acompanhe atualizações** automáticas a cada 30 segundos
+
+### 4. Dashboard Administrativo
 - Acesse: `http://localhost:3000/dashboard`
 - Visualize **métricas em tempo real**
 - Filtre autorizações por status, tipo, período
 - **Tabela interativa** com ordenação e ações rápidas
 - **Atualização automática** configurável
 
-### 4. Validação na Portaria
+### 5. Validação na Portaria
 - Apresente o QR Code gerado
 - A portaria escaneia o código
 - Sistema consulta API em tempo real
@@ -246,6 +302,35 @@ const handleSubmit = async () => {
 - `POST /api/documentos/upload` - Upload de arquivos
 - Payload: `FormData` com arquivo + `autorizacaoId`
 - Retorno: URL real do arquivo no servidor + ID do documento
+
+## 📊 🆕 Dashboard da Portaria - Funcionalidades Detalhadas
+
+### 🎯 Sistema de Board Kanban
+```javascript
+// Colunas e seus significados:
+- 🟢 AUTORIZADO: Status "Autorizado" sem check-ins → Aguardando entrada
+- 🔵 ENTROU: Status "Utilizado" sem check-ins → Acesso em andamento  
+- 🟣 SAIU: Status "Finalizado" sem check-ins → Visita concluída
+- 🔴 EXPIRADO: Status "Expirado" sem check-ins → Prazo vencido
+```
+
+### 📈 Estatísticas em Tempo Real
+- **Atualização automática**: Busca dados a cada 30 segundos
+- **Cálculo inteligente**: Filtra por data atual automaticamente
+- **Métricas acionáveis**: Números que refletem situações reais da portaria
+
+### 🎨 Interface Visual Avançada
+- **Código de cores**:
+  - 🟩 **Verde**: Visitantes
+  - 🟦 **Azul**: Prestadores de serviço  
+  - 🟥 **Vermelho**: Expirados (sobrescreve outras cores)
+- **Ícones significativos**: Cada status tem seu ícone representativo
+- **Layout responsivo**: 4 colunas (desktop) → 2 colunas (tablet) → 1 coluna (mobile)
+
+### ⚡ Ações de Controle
+- **Cancelamento contextual**: Disponível apenas onde faz sentido
+- **Confirmação de ação**: Modal previne cancelamentos acidentais
+- **Feedback imediato**: Interface atualizada instantaneamente após ações
 
 ## 📊 Dashboard Administrativo
 
@@ -308,6 +393,8 @@ VITE_APP_NAME="Sistema de Acesso"
 - `POST /api/comprovantes/upload` - Upload de comprovantes PDF
 - `GET /api/dashboard/metrics` - Métricas do dashboard
 - `GET /api/autorizacoes` - Listar autorizações com filtros
+- `🆕 GET /api/autorizacoes/portaria` - Buscar autorizações para dashboard da portaria
+- `🆕 POST /api/autorizacoes/{id}/cancelar` - Cancelar autorização pela portaria
 
 ## 📊 Funcionalidades Detalhadas
 
@@ -408,13 +495,23 @@ APP_PORT=3000
 - Confirme permissões de armazenamento no navegador
 - Teste em modo de desenvolvimento para debug
 
+**🆕 Dashboard não carrega:**
+- Verifique conexão com a internet
+- Confirme acesso ao endpoint `/api/autorizacoes/portaria`
+- Verifique logs do console do navegador
+
+**🆕 Atualização automática não funciona:**
+- Confirme se JavaScript está habilitado
+- Verifique bloqueadores de conteúdo
+- Teste atualização manual pelo botão
+
 ## 🔄 Histórico de Melhorias
 
-### 🎯 **Versão 7.0.0 - Sistema Otimizado e Anti-Duplicação**
-- ✅ **Dashboard da Portaria** - Dashboard que apresenta as autorizações por Status
-- ✅ **Cancelamento** - Possibilidade do porteiro cancelar uma autorização diretamente no card
-- ✅ **Interface Aprimorada** - Layout mais clean e responsivo
-- ✅ **Debug Avançado** - Logs detalhados para desenvolvimento
+### 🎯 **Versão 7.0.0 - Dashboard da Portaria e Cancelamento**
+- ✅ **Dashboard da Portaria** - Sistema completo de visualização em tempo real com board Kanban
+- ✅ **Cancelamento Direto** - Possibilidade do porteiro cancelar autorizações diretamente nos cards
+- ✅ **Estatísticas em Tempo Real** - Métricas atualizadas automaticamente a cada 30 segundos
+- ✅ **Interface Visual Intuitiva** - Cores e ícones para rápida identificação de status
 
 ### 🎯 **Versão 6.0.0 - Sistema Otimizado e Anti-Duplicação**
 - ✅ **Sistema Anti-Duplicação** - Controle robusto com useRef para prevenir requests duplicados
@@ -481,16 +578,41 @@ APP_PORT=3000
 }
 ```
 
+## 🆕 **Fluxo de Trabalho na Portaria com o Novo Dashboard**
+
+### 1. **Monitoramento Diário**
+- Acesse o dashboard ao iniciar o turno: `http://localhost:3000/portaria-dashboard`
+- Verifique estatísticas do dia na parte superior
+- Identifique autorizações pendentes na coluna "🟢 AUTORIZADO"
+
+### 2. **Controle Visual de Acesso**
+- **Cards Verdes**: Visitantes aguardando entrada - preparar para recebimento
+- **Cards Azuis**: Prestadores em andamento - monitorar permanência
+- **Cards Roxos**: Visitas finalizadas - arquivamento automático
+- **Cards Vermelhos**: Autorizações expiradas - não permitir entrada
+
+### 3. **Ações Rápidas**
+- **Cancelamento**: Clique em "❌ Cancelar" em cards autorizados quando necessário
+- **Atualização**: Use "🔄 Atualizar" para dados imediatos ou aguarde atualização automática
+- **Navegação**: Arrume visualmente as colunas para entender o fluxo do dia
+
+### 4. **Benefícios Operacionais**
+- **Visibilidade completa**: Todas autorizações em um único lugar
+- **Controle em tempo real**: Atualizações automáticas a cada 30s
+- **Interface intuitiva**: Cores e ícones para rápida identificação
+- **Prevenção de erros**: Status visual claro evita equívocos
+
 ## 👥 Próximas Melhorias
 
-- [ ] **Gráficos e Analytics** - Visualizações de dados avançadas
-- [ ] **Exportação de Relatórios** - CSV, Excel, PDF
-- [ ] **Sistema de Notificações** - Email/SMS para moradores
-- [ ] **OCR de Documentos** - Leitura automática de dados
-- [ ] **Assinatura Digital** - Captura de assinatura na portaria
-- [ ] **App Mobile** - Versão mobile para portaria
-- [ ] **Integração com CFTV** - Sistema de câmeras
-- [ ] **Backup Automático** - Backup de documentos e dados
+- [ ] **Filtros avançados** no dashboard por data, tipo e unidade
+- [ ] **Busca em tempo real** por nome e CPF no board Kanban
+- [ ] **Exportação de relatórios** do dashboard em PDF/Excel
+- [ ] **Notificações sonoras** para novas autorizações
+- [ ] **Modo offline** com sincronização posterior
+- [ ] **Integração com CFTV** para confirmação visual
+- [ ] **Gráficos analíticos** de fluxo mensal
+- [ ] **Sistema de alertas** por email/SMS
+- [ ] **App mobile** para rondas da portaria
 
 ## 🛠 Para Desenvolvedores
 
@@ -508,6 +630,10 @@ const pdfResponse = await pdfApi.salvarComprovantePDF(autorizacaoId, pdfBlob, no
 
 // Dashboard metrics
 const metrics = await dashboardApi.getDashboardMetrics();
+
+// 🆕 Dashboard da Portaria
+const portariaData = await autorizacoesApi.buscarAutorizacoesPortaria();
+const cancelamento = await autorizacoesApi.cancelarAutorizacao(autorizacaoId);
 ```
 
 ### Sistema Anti-Duplicação
@@ -522,6 +648,19 @@ if (isSubmittingRef.current) {
   console.log('Operação já em andamento, ignorando...');
   return;
 }
+```
+
+### 🆕 Estrutura do Dashboard da Portaria
+```javascript
+// Componentes principais do PortariaDashboard:
+- PortariaDashboard.jsx    // Container principal
+- StatsCards.jsx          // Cartões de estatísticas 
+- KanbanBoard.jsx         // Board com 4 colunas
+- KanbanColumn.jsx        // Coluna individual
+- KanbanCard.jsx          // Card de autorização
+
+// Fluxo de dados:
+fetchAutorizacoes() → calcularStats() → renderizarBoard()
 ```
 
 ### Estrutura do Comprovante PDF
@@ -539,7 +678,7 @@ const pdf = new jsPDF('p', 'mm', 'a4');
 
 **Desenvolvido com ❤️ para simplificar o cadastro e controle de acesso em condomínios e empresas.**
 
-**🎉 Sistema 100% funcional com upload real de documentos, dashboard administrativo e salvamento automático de comprovantes!**
+**🎉 Sistema 100% funcional com upload real de documentos, dashboard administrativo, dashboard da portaria e salvamento automático de comprovantes!**
 
 **🛡️ Sistema Anti-Duplicação implementado para garantir performance e consistência**
 
@@ -547,6 +686,8 @@ const pdf = new jsPDF('p', 'mm', 'a4');
 
 **📊 Dashboard completo para gestão e monitoramento em tempo real**
 
+**🆕 PortariaDashboard - Controle visual intuitivo para a equipe da portaria**
+
 **🖨️ Comprovantes profissionais com salvamento automático no backend**
 
-**🚀 Versão 6.0.0 - Sistema otimizado e robusto para produção**
+**🚀 Versão 7.0.0 - Sistema completo com dashboard da portaria e cancelamento direto**
