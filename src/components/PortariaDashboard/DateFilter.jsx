@@ -2,8 +2,27 @@ import React from 'react';
 import './DateFilter.css';
 
 const DateFilter = ({ selectedDate, onDateChange }) => {
-  const hoje = new Date().toISOString().split('T')[0];
+  // Função para obter data atual no fuso horário de São Paulo
+  const getDataAtualBrasil = () => {
+    const agora = new Date();
+    // Ajusta para o fuso horário do Brasil (UTC-3)
+    const offset = -3 * 60; // UTC-3 em minutos
+    const dataBrasil = new Date(agora.getTime() + offset * 60 * 1000);
+    return dataBrasil.toISOString().split('T')[0];
+  };
+
+  const hoje = getDataAtualBrasil();
   
+  // Função para converter qualquer data para o formato YYYY-MM-DD no fuso Brasil
+  const formatarDataParaAPI = (data) => {
+    const dataObj = new Date(data);
+    // Garante que a data seja tratada como local, não UTC
+    const ano = dataObj.getFullYear();
+    const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataObj.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  };
+
   const handleDateChange = (event) => {
     onDateChange(event.target.value);
   };
@@ -15,18 +34,19 @@ const DateFilter = ({ selectedDate, onDateChange }) => {
   const avancarDia = () => {
     const data = new Date(selectedDate);
     data.setDate(data.getDate() + 1);
-    onDateChange(data.toISOString().split('T')[0]);
+    onDateChange(formatarDataParaAPI(data));
   };
 
   const retrocederDia = () => {
     const data = new Date(selectedDate);
     data.setDate(data.getDate() - 1);
-    onDateChange(data.toISOString().split('T')[0]);
+    onDateChange(formatarDataParaAPI(data));
   };
 
   const formatarDataExibicao = (dataISO) => {
-    const data = new Date(dataISO);
+    const data = new Date(dataISO + 'T12:00:00-03:00'); // Força fuso horário Brasil
     return data.toLocaleDateString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
       weekday: 'long',
       year: 'numeric',
       month: 'long',
