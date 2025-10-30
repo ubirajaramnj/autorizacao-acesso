@@ -82,3 +82,27 @@
     align-items: flex-start;
   }
 }
+
+/* No KanbanBoard.css */
+.no-data-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+}
+
+.no-data-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.no-data-message h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.no-data-message p {
+  margin: 0;
+  font-size: 14px;
+}

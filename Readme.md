@@ -8,6 +8,12 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 
 ## 🚀 Novas Melhorias Implementadas
 
+### 🎯 **Versão 7.1.0 - Filtro por Data em Tempo Real**
+- ✅ **Filtro de Calendário Inteligente** - Selecione qualquer data para visualizar autorizações específicas
+- ✅ **Navegação por Datas** - Botões anterior/próximo e "Hoje" para navegação rápida
+- ✅ **Atualização Automática** - Dados atualizados a cada 30s mesmo em datas passadas
+- ✅ **Busca Direta na API** - Performance otimizada buscando apenas dados necessários
+
 ### 🎯 **Versão 7.0.0 - Dashboard da Portaria e Cancelamento**
 - ✅ **Dashboard da Portaria** - Sistema completo de visualização em tempo real com board Kanban
 - ✅ **Cancelamento Direto** - Possibilidade do porteiro cancelar autorizações diretamente nos cards
@@ -34,6 +40,8 @@ Sistema web desenvolvido em React para cadastro de visitantes e prestadores de s
 - **Dashboard Administrativo**: Métricas em tempo real e filtros avançados
 - **🆕 Dashboard da Portaria**: Controle visual em tempo real com board Kanban
 - **🆕 Cancelamento por Portaria**: Controle granular de autorizações
+- **🆕 Filtro por Data Avançado** - Visualize autorizações de qualquer data com navegação intuitiva
+- **🆕 Atualização em Tempo Real** - Dados sincronizados automaticamente mesmo em datas específicas
 - **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 - **Validações Completa**: Formulário com validações robustas
 - **Máscaras Inteligentes**: CPF, CNPJ, telefone e RG formatados automaticamente
@@ -242,7 +250,12 @@ VITE_PORT=4000 APP_PORT=4000 docker-compose up --build
 - **Monitore o fluxo** através do board Kanban com 4 colunas
 - **Identifique rapidamente** status por cores e ícones
 - **Cancele autorizações** diretamente nos cards quando necessário
-- **Acompanhe atualizações** automáticas a cada 30 segundos
+- **Acompanhe atualizações** automáticas a cada 60 segundos
+- **Use o calendário** no topo para selecionar qualquer data
+- **Navegue entre dias** com os botões ◀ ▶ 
+- **Volte para hoje** com um clique no botão "Hoje"
+- **Visualize estatísticas** específicas da data selecionada
+- **Monitorize em tempo real** - dados atualizados automaticamente
 
 ### 4. Dashboard Administrativo
 - Acesse: `http://localhost:3000/dashboard`
@@ -313,6 +326,14 @@ const handleSubmit = async () => {
 - 🟣 SAIU: Status "Finalizado" sem check-ins → Visita concluída
 - 🔴 EXPIRADO: Status "Expirado" sem check-ins → Prazo vencido
 ```
+### 🎯 Sistema de Filtro por Data
+```javascript
+// Funcionalidades do filtro:
+- 📅 Seletor de data nativo do navegador
+- ◀▶ Navegação por dias consecutivos  
+- 🏠 Botão "Hoje" para retorno rápido
+- 🔄 Atualização automática mantida para qualquer data
+- ⚡ Busca direta na API com parâmetro de data
 
 ### 📈 Estatísticas em Tempo Real
 - **Atualização automática**: Busca dados a cada 30 segundos
@@ -395,6 +416,7 @@ VITE_APP_NAME="Sistema de Acesso"
 - `GET /api/autorizacoes` - Listar autorizações com filtros
 - `🆕 GET /api/autorizacoes/portaria` - Buscar autorizações para dashboard da portaria
 - `🆕 POST /api/autorizacoes/{id}/cancelar` - Cancelar autorização pela portaria
+- `🆕 GET /api/autorizacoes/portaria?data=2024-01-15` - Buscar Autorizações por data
 
 ## 📊 Funcionalidades Detalhadas
 
@@ -602,6 +624,12 @@ APP_PORT=3000
 - **Interface intuitiva**: Cores e ícones para rápida identificação
 - **Prevenção de erros**: Status visual claro evita equívocos
 
+### 5. **Controle por Data Específica**
+- **Selecione uma data** no calendário superior
+- **Visualize autorizações** específicas daquele dia
+- **Navegue entre dias** para comparar períodos
+- **Mantenha o monitoramento** - atualizações automáticas funcionam em qualquer data
+
 ## 👥 Próximas Melhorias
 
 - [ ] **Filtros avançados** no dashboard por data, tipo e unidade
@@ -613,6 +641,9 @@ APP_PORT=3000
 - [ ] **Gráficos analíticos** de fluxo mensal
 - [ ] **Sistema de alertas** por email/SMS
 - [ ] **App mobile** para rondas da portaria
+- [ ] **Relatório comparativo** entre diferentes datas
+- [ ] **Filtro por período** (range de datas)
+- [ ] **Estatísticas históricas** com gráficos temporais
 
 ## 🛠 Para Desenvolvedores
 
@@ -690,4 +721,4 @@ const pdf = new jsPDF('p', 'mm', 'a4');
 
 **🖨️ Comprovantes profissionais com salvamento automático no backend**
 
-**🚀 Versão 7.0.0 - Sistema completo com dashboard da portaria e cancelamento direto**
+**🚀 Versão 7.1.0 - Sistema completo com filtro por data em tempo real**

@@ -1,0 +1,130 @@
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* backdrop-filter: blur(10px); */
+}
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  min-width: 40px;
+}
+
+.nav-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.date-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 200px;
+}
+
+.selected-date {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.today-button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.today-button:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+.date-picker {
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.date-input:hover {
+  background: white;
+  border-color: #3498db;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .date-filter {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .date-navigation {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .date-display {
+    min-width: auto;
+  }
+  
+  .selected-date {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .date-filter {
+    padding: 8px 12px;
+  }
+  
+  .nav-button {
+    padding: 6px 10px;
+    min-width: 35px;
+  }
+  
+  .selected-date {
+    font-size: 11px;
+  }
+}

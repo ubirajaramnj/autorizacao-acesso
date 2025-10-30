@@ -171,9 +171,16 @@ export const autorizacoesApi = {
   },
 
   // Buscar autorizações para dashboard da portaria
-  async buscarAutorizacoesPortaria() {
+  async buscarAutorizacoesPortaria(dataFiltro = null) {
     try {
-      const response = await apiClient.get('/autorizacoes/condominio/SOLARITAC');
+      let url = '/autorizacoes/condominio/SOLARITAC/NaData/';
+      
+      // Se tem data filtro, adiciona como parâmetro
+      if (dataFiltro) {
+        url += `${dataFiltro}`;
+      }
+      
+      const response = await apiClient.get(url);
       return {
         data: response.data,
         status: response.status

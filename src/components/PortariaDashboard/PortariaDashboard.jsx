@@ -4,12 +4,14 @@ import { autorizacoesApi } from '../../services/autorizacoesApi';
 import Loader from '../Loader/Loader';
 import KanbanBoard from './KanbanBoard';
 import StatsCards from './StatsCards';
+import DateFilter from './DateFilter';
 import './PortariaDashboard.css';
 
 const PortariaDashboard = () => {
   const [autorizacoes, setAutorizacoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [stats, setStats] = useState({
     totalAutorizacoes: 0,
     acessosHoje: 0,
@@ -18,39 +20,45 @@ const PortariaDashboard = () => {
   });
 
   // Buscar autorizações
-  const fetchAutorizacoes = useCallback(async () => {
+  const fetchAutorizacoes = async (dataFiltro = null) => {
+    const dataParaBuscar = dataFiltro || selectedDate;
     try {
       setLoading(true);
-      const response = await autorizacoesApi.buscarAutorizacoesPortaria();
+      const response = await autorizacoesApi.buscarAutorizacoesPortaria(dataParaBuscar);
       setAutorizacoes(response.data);
-      calcularStats(response.data);
+      calcularStats(response.data, dataParaBuscar);
     } catch (err) {
       console.error('Erro ao buscar autorizações:', err);
       setError('Erro ao carregar autorizações');
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   // Calcular estatísticas
-  const calcularStats = (data) => {
-    const hoje = new Date().toISOString().split('T')[0];
-    
-    const totalAutorizacoes = data.length;
+  const calcularStats = (data, dataFiltro) => {
     const acessosHoje = data.filter(a => 
-      a.checkins?.some(checkin => checkin.dataHoraEntrada?.includes(hoje))
+      a.checkins?.some(checkin => checkin.dataHoraEntrada?.includes(dataFiltro))
     ).length;
+    
     const saidasHoje = data.filter(a => 
-      a.checkins?.some(checkin => checkin.dataHoraSaida?.includes(hoje))
+      a.checkins?.some(checkin => checkin.dataHoraSaida?.includes(dataFiltro))
     ).length;
+    
     const pendentes = data.filter(a => a.status === 'autorizado' && !a.checkins?.length).length;
 
     setStats({
-      totalAutorizacoes,
+      totalAutorizacoes: data.length,
       acessosHoje,
       saidasHoje,
       pendentes
     });
+  };
+
+  // Handler para mudança de data
+  const handleDateChange = (novaData) => {
+    setSelectedDate(novaData);
+    fetchAutorizacoes(novaData); // Busca dados da nova data
   };
 
   // Cancelar autorização
@@ -61,17 +69,7 @@ const PortariaDashboard = () => {
 
     try {
       await autorizacoesApi.cancelarAutorizacao(autorizacaoId);
-      setAutorizacoes(prev => 
-        prev.map(a => 
-          a.id === autorizacaoId 
-            ? { ...a, status: 'cancelado' } 
-            : a
-        )
-      );
-      // Recarregar stats
-      calcularStats(autorizacoes.map(a => 
-        a.id === autorizacaoId ? { ...a, status: 'cancelado' } : a
-      ));
+      fetchAutorizacoes(selectedDate);
     } catch (err) {
       console.error('Erro ao cancelar autorização:', err);
       setError('Erro ao cancelar autorização');
@@ -79,12 +77,16 @@ const PortariaDashboard = () => {
   };
 
   // Atualização automática a cada 30 segundos
+  // useEffect para atualizações automáticas
   useEffect(() => {
-    fetchAutorizacoes();
+    fetchAutorizacoes(); // Busca inicial
     
-    const interval = setInterval(fetchAutorizacoes, 30000);
+    const interval = setInterval(() => {
+      fetchAutorizacoes(); // Atualiza a data atual selecionada
+    }, 60000);
+    
     return () => clearInterval(interval);
-  }, [fetchAutorizacoes]);
+  }, [selectedDate]); // Recria quando selectedDate muda
 
   if (loading && autorizacoes.length === 0) {
     return <Loader logoSize="large" message="Carregando dashboard..." />;
@@ -107,8 +109,12 @@ const PortariaDashboard = () => {
         </div>
         
         <div className="dashboard-controls">
+          <DateFilter 
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+          />
           <button 
-            onClick={fetchAutorizacoes}
+            onClick={() => fetchAutorizacoes()}
             className="refresh-btn"
             disabled={loading}
           >

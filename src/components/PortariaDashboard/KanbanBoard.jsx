@@ -3,7 +3,7 @@ import React from 'react';
 import KanbanColumn from './KanbanColumn';
 import './KanbanBoard.css';
 
-const KanbanBoard = ({ autorizacoes, onCancelarAutorizacao, loading }) => {
+const KanbanBoard = ({ autorizacoes, onCancelarAutorizacao, loading, selectedDate }) => {
   // Classificar autorizações por status
   const autorizadas = autorizacoes.filter(a => 
     a.status === 'Autorizado' && !a.checkins?.length
@@ -52,10 +52,39 @@ const KanbanBoard = ({ autorizacoes, onCancelarAutorizacao, loading }) => {
     }
   ];
 
+
+
+  if (autorizacoes.length === 0 && !loading) {
+    return (
+      <div className="kanban-board">
+        <div className="kanban-header">
+          <h2>Controle de Acessos</h2>
+          <div className="date-info">
+              Exibindo dados para: {new Date(selectedDate).toLocaleDateString('pt-BR')}
+            </div>
+          <div className="board-stats">
+            Total: {autorizacoes.length} autorizações
+          </div>
+        </div>
+
+        <div className="no-data-message">
+          <div className="no-data-icon">📭</div>
+          <h3>Nenhuma autorização encontrada</h3>
+          <p>Não há autorizações para a data selecionada.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="kanban-board">
       <div className="kanban-header">
-        <h2>Controle de Acessos</h2>
+        <div>
+          <h2>Controle de Acessos</h2>
+          <div className="date-info">
+            Exibindo dados para: {new Date(selectedDate).toLocaleDateString('pt-BR')}
+          </div>
+        </div>
         <div className="board-stats">
           Total: {autorizacoes.length} autorizações
         </div>
